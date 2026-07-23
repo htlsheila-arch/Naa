@@ -1,0 +1,1904 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Complexe La Casa Del Shei - Gestion complète</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<style>
+:root {
+    --navy: #0f172a; --navy2: #1e293b; --orange: #f97316; --orange2: #fb923c;
+    --teal: #0ea5a4; --green: #16a34a; --red: #dc2626; --blue: #3b82f6;
+    --bg1: #eef2ff; --bg2: #f8fafc; --card-radius: 1.4rem;
+}
+* { box-sizing: border-box; font-family: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif; }
+body { background: linear-gradient(160deg, var(--bg1) 0%, var(--bg2) 55%, #fff7ed 100%); background-attachment: fixed; margin: 0; padding: 20px; color: #1e293b; }
+h1, h2, h3, .stat-number { font-family: 'Poppins', 'Inter', sans-serif; }
+.app-container { max-width: 1400px; margin: 0 auto; background: rgba(255,255,255,0.85); backdrop-filter: blur(10px); border-radius: 2rem; box-shadow: 0 25px 50px -20px rgba(15,23,42,0.25); overflow: hidden; border: 1px solid rgba(255,255,255,0.6); }
+header { background: linear-gradient(120deg, var(--navy) 0%, #1e3a5f 60%, #0f4c5c 100%); color: white; padding: 1.1rem 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; box-shadow: 0 2px 12px rgba(0,0,0,0.15); }
+header h1 { margin: 0; font-size: 1.5rem; font-weight: 800; letter-spacing: 0.02em; display: flex; align-items: center; gap: 0.5rem; }
+.user-info { display: flex; gap: 1rem; align-items: center; font-size: 0.9rem; }
+.logout-btn { background: rgba(220,38,38,0.85); border: none; padding: 0.4rem 1.1rem; border-radius: 2rem; cursor: pointer; color: white; font-weight: 600; transition: 0.2s; }
+.logout-btn:hover { background: var(--red); transform: translateY(-1px); }
+nav { display: flex; flex-wrap: wrap; background: rgba(248,250,252,0.9); border-bottom: 1px solid #e2e8f0; gap: 0.3rem; padding: 0.6rem 1rem; }
+.nav-btn { position: relative; background: transparent; border: none; padding: 0.65rem 1.1rem; font-weight: 600; font-size: 0.92rem; cursor: pointer; color: #475569; border-radius: 1.4rem; transition: all 0.2s; }
+.nav-btn:hover { background: #e2e8f0; color: var(--navy); transform: none; }
+.nav-btn.active { background: linear-gradient(120deg, var(--orange) 0%, var(--orange2) 100%); color: white; box-shadow: 0 4px 12px rgba(249,115,22,0.35); }
+.nav-btn-label { pointer-events: none; }
+.tab-content { display: none; padding: 2rem; animation: fadeIn 0.25s ease; }
+.tab-content.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1.5rem; margin-top: 1rem; }
+.card { background: #ffffff; border-radius: var(--card-radius); border: 1px solid #eef2f7; padding: 1.4rem; box-shadow: 0 8px 20px -8px rgba(15,23,42,0.12); transition: transform 0.2s, box-shadow 0.2s; }
+.card:hover { box-shadow: 0 14px 28px -10px rgba(15,23,42,0.18); }
+.card h3 { margin-top: 0; border-left: 5px solid var(--orange); padding-left: 0.8rem; font-weight: 700; color: var(--navy); }
+button, .btn { background: var(--navy); border: none; color: white; padding: 0.55rem 1.1rem; border-radius: 2rem; cursor: pointer; font-weight: 600; margin: 0.2rem; transition: all 0.18s; letter-spacing: 0.01em; }
+button:hover { background: var(--orange); transform: translateY(-1px); box-shadow: 0 6px 14px -4px rgba(249,115,22,0.5); }
+button:active { transform: translateY(0); }
+button:disabled { background: #cbd5e1; cursor: not-allowed; transform: none; box-shadow: none; }
+input, select, textarea { padding: 0.6rem 0.8rem; border-radius: 1rem; border: 1.5px solid #dbe3ee; width: 100%; margin: 0.3rem 0; font-size: 0.95rem; transition: border 0.15s; background: #fff; }
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--orange); }
+.flex-form { display: flex; flex-direction: column; gap: 0.6rem; }
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 0.5rem; border-bottom: 1px solid #e2e8f0; }
+.summary { background: linear-gradient(120deg, #fff7ed, #fef3c7); border: 1px solid #fde8b6; padding: 0.8rem 1.2rem; border-radius: 1.1rem; margin-bottom: 1rem; font-weight: 500; color: #78350f; }
+.dashboard-stats { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; }
+.stat-card { background: linear-gradient(150deg, #ffffff, #f8fafc); border: 1px solid #eef2f7; border-radius: 1.2rem; padding: 1.1rem; flex: 1; min-width: 160px; text-align: center; box-shadow: 0 6px 16px -8px rgba(15,23,42,0.12); }
+.stat-number { font-size: 1.9rem; font-weight: 800; background: linear-gradient(120deg, var(--navy), #0f4c5c); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.print-receipt { background: var(--green); }
+.print-receipt:hover { background: #15803d; }
+hr { margin: 1rem 0; border: none; border-top: 1px solid #e2e8f0; }
+.danger-btn { background: var(--red); }
+.danger-btn:hover { background: #b91c1c; }
+.badge { display:inline-block; padding: 0.2rem 0.75rem; border-radius: 1rem; font-size: 0.75rem; font-weight: 700; color:white; letter-spacing: 0.02em; }
+.badge-attente { background: linear-gradient(120deg,#f59e0b,#fb923c); }
+.badge-prepa { background: linear-gradient(120deg,#3b82f6,#60a5fa); }
+.badge-servi { background: linear-gradient(120deg,#16a34a,#22c55e); }
+.badge-libre { background: var(--green); }
+.badge-occupee { background: var(--red); }
+.badge-count { display:inline-flex; align-items:center; justify-content:center; min-width:1.35rem; height:1.35rem; padding:0 0.3rem; background: var(--red); color:white; border-radius:1rem; font-size:0.72rem; font-weight:800; margin-left:0.4rem; }
+.nav-badge { position: relative; top: -1px; }
+.room-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(180px,1fr)); gap:1rem; margin-top:1rem; }
+.room-card { border-radius:1.2rem; padding:1.1rem; color:white; text-align:center; box-shadow: 0 8px 18px -8px rgba(0,0,0,0.3); transition: transform 0.15s; }
+.room-card:hover { transform: translateY(-2px); }
+.room-card.libre { background:linear-gradient(135deg,#22c55e,#15803d); }
+.room-card.occupee { background:linear-gradient(135deg,#f87171,#b91c1c); }
+.room-card .roomnum { font-size:1.7rem; font-weight:800; }
+.qty-stepper { display:flex; align-items:center; gap:0.5rem; margin:0.3rem 0; }
+.qty-stepper button { padding:0.2rem 0.7rem; margin:0; }
+.qty-stepper span { min-width:2rem; text-align:center; font-weight:700; }
+.solde-banner { background: linear-gradient(120deg, var(--navy), #1e3a5f); color:white; border-radius:1.4rem; padding:1.4rem; text-align:center; margin-bottom:1rem; box-shadow: 0 10px 25px -10px rgba(15,23,42,0.5); }
+.solde-banner .montant { font-size:2.3rem; font-weight:800; color: var(--orange2); }
+#reader { width:100%; max-width:400px; margin:0.5rem 0; border-radius: 1rem; overflow: hidden; }
+.tableSelectorGrid { display:grid; grid-template-columns:repeat(auto-fill,minmax(100px,1fr)); gap:0.6rem; }
+.tableSelectorGrid button { background: linear-gradient(120deg, var(--orange), var(--orange2)); }
+
+/* --- Toasts / notifications --- */
+#toastContainer { position: fixed; top: 1rem; right: 1rem; z-index: 9999; display: flex; flex-direction: column; gap: 0.6rem; max-width: 320px; }
+.toast { background: var(--navy); color: white; padding: 0.9rem 1.1rem; border-radius: 1rem; box-shadow: 0 12px 30px -10px rgba(0,0,0,0.4); font-size: 0.9rem; animation: toastIn 0.3s ease; border-left: 4px solid var(--orange); }
+.toast-commande { border-left-color: var(--green); }
+.toast-message { border-left-color: var(--blue); }
+.toast-out { animation: toastOut 0.4s ease forwards; }
+@keyframes toastIn { from { opacity:0; transform: translateX(30px); } to { opacity:1; transform: translateX(0); } }
+@keyframes toastOut { to { opacity:0; transform: translateX(30px); } }
+
+/* --- Messagerie --- */
+.msg-layout { display: grid; grid-template-columns: 220px 1fr; gap: 1rem; margin-top: 1rem; min-height: 420px; }
+.msg-contacts { background: #fff; border-radius: 1.2rem; border: 1px solid #eef2f7; padding: 0.6rem; height: fit-content; box-shadow: 0 8px 20px -10px rgba(15,23,42,0.1); }
+.msg-contact { padding: 0.6rem 0.8rem; border-radius: 0.9rem; cursor: pointer; font-weight: 600; color: #334155; display:flex; align-items:center; justify-content:space-between; margin-bottom: 0.2rem; transition: 0.15s; }
+.msg-contact:hover { background: #f1f5f9; }
+.msg-contact.active { background: linear-gradient(120deg, var(--orange), var(--orange2)); color: white; }
+.msg-thread { background: #fff; border-radius: 1.2rem; border: 1px solid #eef2f7; display: flex; flex-direction: column; box-shadow: 0 8px 20px -10px rgba(15,23,42,0.1); overflow: hidden; }
+.msg-thread-header { padding: 0.9rem 1.2rem; font-weight: 700; background: #f8fafc; border-bottom: 1px solid #eef2f7; color: var(--navy); }
+.msg-thread-body { flex: 1; padding: 1rem 1.2rem; overflow-y: auto; max-height: 340px; display: flex; flex-direction: column; gap: 0.5rem; }
+.msg-bubble { max-width: 75%; padding: 0.6rem 0.9rem; border-radius: 1rem; font-size: 0.9rem; }
+.msg-bubble.mine { align-self: flex-end; background: linear-gradient(120deg, var(--orange), var(--orange2)); color: white; border-bottom-right-radius: 0.3rem; }
+.msg-bubble.theirs { align-self: flex-start; background: #f1f5f9; color: #1e293b; border-bottom-left-radius: 0.3rem; }
+.msg-meta { font-size: 0.72rem; opacity: 0.75; margin-bottom: 0.15rem; }
+.msg-composer { display: flex; gap: 0.5rem; padding: 0.8rem; border-top: 1px solid #eef2f7; background: #f8fafc; }
+.msg-composer input { margin: 0; }
+.msg-composer button { margin: 0; white-space: nowrap; }
+
+.emp-row { display:flex; justify-content:space-between; align-items:flex-start; gap:0.6rem; padding:0.6rem 0; border-bottom: 1px dashed #e2e8f0; }
+.emp-row code { background: #f1f5f9; padding: 0.1rem 0.5rem; border-radius: 0.5rem; }
+.pw-toggle { padding: 0.15rem 0.5rem; font-size: 0.8rem; margin-left: 0.3rem; }
+
+@media (max-width: 700px) {
+    .tab-content { padding: 1rem; }
+    .nav-btn { padding: 0.5rem 0.8rem; }
+    .msg-layout { grid-template-columns: 1fr; }
+    .msg-contacts { display: flex; overflow-x: auto; gap: 0.4rem; }
+}
+</style>
+</head>
+<body>
+<div id="toastContainer"></div>
+
+<div id="loginScreen" style="max-width:450px; margin: 5rem auto; background:white; border-radius:2rem; padding:2rem; box-shadow:0 10px 25px rgba(0,0,0,0.1);">
+    <h2 style="text-align:center">🏨 Complexe La Casa Del Shei</h2>
+    <p style="text-align:center">Connexion personnel</p>
+    <input type="text" id="loginUsername" placeholder="Nom d'utilisateur" style="margin-bottom:0.5rem">
+    <input type="password" id="loginPassword" placeholder="Mot de passe">
+    <button id="loginBtn" style="width:100%; margin-top:1rem;">Se connecter</button>
+    <div id="loginError" style="color:red; text-align:center; margin-top:1rem;"></div>
+    <hr>
+    <button id="goClientBtn" class="print-receipt" style="width:100%;">📱 Tablette Client (Table)</button>
+</div>
+
+<div id="roleSelectScreen" style="display:none; max-width:450px; margin: 5rem auto; background:white; border-radius:2rem; padding:2rem; box-shadow:0 10px 25px rgba(0,0,0,0.1);">
+    <h2 style="text-align:center">👤 Choisissez votre rôle</h2>
+    <p style="text-align:center; color:#64748b;" id="roleSelectSubtitle"></p>
+    <div id="roleSelectButtons" style="display:flex; flex-direction:column; gap:0.6rem;"></div>
+    <button id="backToLoginFromRole" style="width:100%; margin-top:1.2rem; background:#64748b;">⬅ Retour</button>
+</div>
+
+<div id="clientSelectScreen" style="display:none; max-width:500px; margin: 3rem auto; background:white; border-radius:2rem; padding:2rem; box-shadow:0 10px 25px rgba(0,0,0,0.1);">
+    <h2 style="text-align:center">📱 Sélection de la table</h2>
+    <p style="text-align:center; color:#64748b;">Choisissez le numéro de table affecté à cette tablette</p>
+    <div id="tableSelectorList" class="tableSelectorGrid"></div>
+    <button id="backToLoginBtn" style="width:100%; margin-top:1rem; background:#64748b;">⬅ Retour</button>
+</div>
+
+<div id="clientAppScreen" style="display:none;">
+    <div class="app-container">
+        <header>
+            <h1 id="clientHeaderTitle">🍹 Ma commande</h1>
+            <div class="user-info">
+                <button id="clientLogoutBtn" class="logout-btn">Quitter</button>
+            </div>
+        </header>
+        <div id="clientAppContent" style="padding:2rem;"></div>
+    </div>
+</div>
+
+<div id="mainApp" style="display:none;">
+    <div class="app-container">
+        <header>
+            <h1>🏨 COMPLEXE LA CASA DEL SHEI</h1>
+            <div class="user-info">
+                <span id="roleDisplay"></span>
+                <button id="logoutBtn" class="logout-btn">Déconnexion</button>
+            </div>
+        </header>
+        <nav id="tabNav"></nav>
+        <div id="tabContents"></div>
+    </div>
+</div>
+
+<script>
+// ================================================================
+// ⚠️ CONFIGURATION — à modifier une fois le backend déployé
+// ================================================================
+// Remplacez cette URL par celle de votre backend (server.js) une fois déployé
+// (Render, Railway, Fly.io, etc.). En local pendant les tests : http://localhost:3000
+const API_BASE = "http://localhost:3000";
+
+// ================================================================
+// 1. DONNÉES
+// ================================================================
+let employees = [];        // { id, username, password, role, nom }
+let servicesBarber = [];
+let coiffeurs = [];
+let ventesBarber = [];
+
+let produitsBar = [];       // { id, nom, prix, zone: "bar"|"vip", stock }  -- "bar" = stock PARTAGÉ entre Bar classique et Bar Piscine
+let ventesBar = [];         // historique des commandes servies { id, date, numeroTable, emplacement, items, total }
+
+let articlesMarket = [];    // { id, nom, prix, stock, codeBarre }
+let ventesMarket = [];
+
+let chambres = [];          // { id, numero, type, prixParNuit, statut: "libre"|"occupee", checkOut }
+let reservationsHotel = []; // { id, clientNom, chambreId, dateDebut, dateFin, statut, typeResa }
+let servicesHotel = [];
+let reservationServices = [];
+
+let comptesTables = [];     // { id, numeroTable, clientNom, emplacement:"bar"|"piscine"|"vip", soldeInitial, solde, dateOuverture, statut:"ouvert"|"ferme" }
+let messages = [];          // { id, fromId, fromNom, toId:employeeId|"all", text, date, lu }
+let commandes = [];         // { id, compteTableId, numeroTable, emplacement, items:[{produitId,nom,prix,qte}], total, statut:"en_attente"|"en_preparation"|"servi", dateCommande }
+let ventesPiscineSessions = []; // { id, date, type:"seul"|"couple"|"groupe", nbPersonnes, prixUnitaire, gratuits, payants, sousTotal, rabaisPourcent, montantRabais, total }
+
+let currentUser = null;
+let currentRole = "";
+let currentClientCompteId = null;
+let dispoRefreshInterval = null;
+let tauxChange = 130; // Gourdes (HTG) pour 1 Dollar ($). Modifiable par l'admin.
+let prixSeancePiscine = 5;      // Prix d'une séance piscine, PAR PERSONNE ($). Modifiable par l'admin.
+let seuilGratuitGroupe = 12;    // Taille de groupe pour 1 personne gratuite (ex: 12 => paient 11, 1 gratuite)
+let rabaisGroupePourcent = 0;   // Rabais groupe (%) que l'admin autorise, appliqué au choix par le personnel
+
+const NB_TABLES = 30;
+
+// Formate un montant (stocké en $) en affichant aussi son équivalent en Gourdes
+function formatMontant(usd) {
+    const g = Math.round(usd * tauxChange);
+    return `${usd.toFixed(2)} $ <span style="color:#64748b;font-size:0.85em;">(${g.toLocaleString('fr-FR')} HTG)</span>`;
+}
+function formatMontantTexte(usd) {
+    const g = Math.round(usd * tauxChange);
+    return `${usd.toFixed(2)} $ (${g.toLocaleString('fr-FR')} HTG)`;
+}
+
+// ================================================================
+// 2. CHARGEMENT / SAUVEGARDE
+// ================================================================
+function loadAllData() {
+    return fetch(`${API_BASE}/api/state`)
+        .then(res => { if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
+        .then(d => {
+            servicesBarber = d.servicesBarber || [];
+            coiffeurs = d.coiffeurs || [];
+            ventesBarber = d.ventesBarber || [];
+            produitsBar = d.produitsBar || [];
+            ventesBar = d.ventesBar || [];
+            articlesMarket = d.articlesMarket || [];
+            ventesMarket = d.ventesMarket || [];
+            chambres = d.chambres || [];
+            reservationsHotel = d.reservationsHotel || [];
+            servicesHotel = d.servicesHotel || [];
+            reservationServices = d.reservationServices || [];
+            comptesTables = d.comptesTables || [];
+            commandes = d.commandes || [];
+            tauxChange = d.tauxChange || 130;
+            ventesPiscineSessions = d.ventesPiscineSessions || [];
+            prixSeancePiscine = (typeof d.prixSeancePiscine === "number") ? d.prixSeancePiscine : 5;
+            seuilGratuitGroupe = d.seuilGratuitGroupe || 12;
+            rabaisGroupePourcent = (typeof d.rabaisGroupePourcent === "number") ? d.rabaisGroupePourcent : 0;
+            messages = d.messages || [];
+        })
+        .then(() => fetch(`${API_BASE}/api/employees`))
+        .then(res => { if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
+        .then(emps => { employees = emps || []; })
+        .catch(e => { console.error("Erreur de connexion au serveur:", e); throw e; });
+}
+function saveAllData() {
+    const toStore = {
+        servicesBarber, coiffeurs, ventesBarber,
+        produitsBar, ventesBar,
+        articlesMarket, ventesMarket,
+        chambres, reservationsHotel, servicesHotel, reservationServices,
+        comptesTables, commandes, tauxChange,
+        ventesPiscineSessions, prixSeancePiscine, seuilGratuitGroupe, rabaisGroupePourcent,
+        messages
+    };
+    // Best-effort : on n'attend pas la réponse pour ne pas bloquer l'interface (comme avant avec localStorage)
+    fetch(`${API_BASE}/api/state`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(toStore)
+    }).catch(e => console.error("Erreur de sauvegarde vers le serveur:", e));
+}
+// Recharge les données depuis le serveur (utile pour la synchro entre appareils différents)
+function reloadFromStorage() {
+    return loadAllData();
+}
+
+// ================================================================
+// 3. UTILITAIRES
+// ================================================================
+function printReceipt(title, lines, totalUsd) {
+    // IMPORTANT: cette fonction ne doit JAMAIS lever d'erreur qui bloquerait le reste du
+    // traitement (sauvegarde des données, rafraîchissement de l'écran). L'impression est
+    // une opération "best effort" — si elle échoue (popup bloqué, WebView Android sans
+    // support window.open, etc.) on l'ignore silencieusement.
+    try {
+        const total = typeof totalUsd === "number" ? totalUsd : parseFloat(totalUsd) || 0;
+        let content = `<div style="font-family: monospace; width: 280px; margin:0 auto; padding:1rem;">
+            <h3 style="text-align:center">🏨 COMPLEXE LA CASA DEL SHEI</h3>
+            <p style="text-align:center">${title}</p>
+            <hr/>
+            ${lines.map(l => `<div>${l}</div>`).join('')}
+            <hr/>
+            <div style="font-weight:bold">TOTAL : ${formatMontantTexte(total)}</div>
+            <p style="text-align:center; font-size:0.8rem;">${new Date().toLocaleString()}</p>
+            </div>`;
+        // 1) Pont natif Android éventuel (comme pour l'impression thermique Sunmi)
+        if (window.AndroidPrint && typeof window.AndroidPrint.printHtml === "function") {
+            window.AndroidPrint.printHtml(content);
+            return;
+        }
+        // 2) Fallback navigateur classique
+        let win = window.open();
+        if (!win) { console.warn("Impression: fenêtre bloquée par le navigateur"); return; }
+        win.document.write(content);
+        win.print();
+        win.close();
+    } catch (e) {
+        console.warn("Impression indisponible sur cet appareil:", e);
+    }
+}
+function tablesDisponibles() {
+    const prises = comptesTables.filter(c => c.statut === "ouvert").map(c => c.numeroTable);
+    const dispo = [];
+    for (let i = 1; i <= NB_TABLES; i++) if (!prises.includes(i)) dispo.push(i);
+    return dispo;
+}
+function formatRemaining(ms) {
+    if (ms <= 0) return "Temps écoulé";
+    const totalMin = Math.floor(ms / 60000);
+    const h = Math.floor(totalMin / 60);
+    const m = totalMin % 60;
+    return `${h}h ${m}min`;
+}
+function badgeStatut(s) {
+    if (s === "en_attente") return `<span class="badge badge-attente">En attente</span>`;
+    if (s === "en_preparation") return `<span class="badge badge-prepa">En préparation</span>`;
+    if (s === "servi") return `<span class="badge badge-servi">Servi</span>`;
+    return s;
+}
+function refreshCurrentTab() {
+    const activeBtn = document.querySelector(".nav-btn.active");
+    if (activeBtn && activeBtn._render) activeBtn._render();
+}
+
+// ================================================================
+// 4. CONSTRUCTION DE L'INTERFACE SELON LE RÔLE
+// ================================================================
+function buildUI() {
+    const nav = document.getElementById("tabNav");
+    const container = document.getElementById("tabContents");
+    nav.innerHTML = "";
+    container.innerHTML = "";
+    let tabs = [];
+    if (currentRole === "admin") {
+        tabs = [
+            { id: "adminDash", label: "📊 Dashboard Global", render: renderAdminDashboard },
+            { id: "manageBarPiscineHotel", label: "🏢 Bar / Piscine / Hôtel", render: renderGestionBarPiscineHotel },
+            { id: "manageTaux", label: "💱 Taux de change", render: renderTauxChange },
+            { id: "manageEmployees", label: "👥 Employés", render: renderManageEmployees },
+            { id: "manageBarberServices", label: "💈 Services Barber", render: renderManageBarberServices },
+            { id: "manageCoiffeurs", label: "✂️ Coiffeurs", render: renderManageCoiffeurs },
+            { id: "manageMarket", label: "🛒 Articles Market", render: renderManageMarket }
+        ];
+    } else if (currentRole === "hotel") {
+        tabs = [
+            { id: "hotelDash", label: "📊 Dashboard Réception", render: () => renderBusinessDashboard("hotel") },
+            { id: "hotelResa", label: "🏨 Réservations Hôtel", render: renderHotelResa },
+            { id: "dispoChambres", label: "🕒 Chambres disponibles", render: () => renderDispoChambres("dispoChambres") },
+            { id: "hotelServices", label: "🍽️ Services hôteliers", render: renderHotelServices },
+            { id: "hotelPiscineComptes", label: "💳 Comptes Tables Piscine", render: () => renderComptesTables("hotelPiscineComptes", "piscine") },
+            { id: "hotelPiscineCommandes", label: "📥 Commandes Bar Piscine", render: () => renderCommandesQueue("piscine", "hotelPiscineCommandes") },
+            { id: "hotelPiscineSessions", label: "🏊 Séances Piscine", render: () => renderVentePiscineSession("hotelPiscineSessions") }
+        ];
+    } else if (currentRole === "bar") {
+        tabs = [
+            { id: "barDash", label: "📊 Dashboard Bar & VIP", render: () => renderBusinessDashboard(["bar","vip"], "barDash") },
+            { id: "barComptesTables", label: "💳 Comptes Tables", render: () => renderComptesTables("barComptesTables", ["bar","vip"]) },
+            { id: "barCommandes", label: "📥 Commandes Bar & VIP", render: () => renderCommandesQueue(["bar","vip"], "barCommandes") }
+        ];
+    } else if (currentRole === "barber") {
+        tabs = [
+            { id: "barberDash", label: "📊 Dashboard Barber", render: () => renderBusinessDashboard("barber") },
+            { id: "barberVente", label: "Enregistrer une prestation", render: renderBarberVente },
+            { id: "barberHistorique", label: "Historique", render: renderBarberHistorique }
+        ];
+    } else if (currentRole === "market") {
+        tabs = [
+            { id: "marketDash", label: "📊 Dashboard Market", render: () => renderBusinessDashboard("market") },
+            { id: "marketVente", label: "🛒 Scanner / Caisse", render: renderMarketVente }
+        ];
+    }
+    tabs.push({ id: "messagerie", label: "💬 Messagerie", render: () => renderMessagerie("messagerie") });
+    tabs.forEach((tab, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "nav-btn";
+        if (idx === 0) btn.classList.add("active");
+        btn.innerHTML = `<span class="nav-btn-label">${tab.label}</span><span class="badge-count nav-badge" style="display:none;"></span>`;
+        btn.dataset.tab = tab.id;
+        btn._render = tab.render;
+        btn.addEventListener("click", () => {
+            stopMarketScanner();
+            document.querySelectorAll(".tab-content").forEach(t => t.classList.remove("active"));
+            document.getElementById(tab.id).classList.add("active");
+            document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            if (typeof tab.render === "function") tab.render();
+        });
+        nav.appendChild(btn);
+        const contentDiv = document.createElement("div");
+        contentDiv.id = tab.id;
+        contentDiv.className = "tab-content";
+        if (idx === 0) contentDiv.classList.add("active");
+        container.appendChild(contentDiv);
+    });
+    tabs[0].render();
+    updateNavBadges();
+}
+
+// Met à jour les pastilles de notification sur les onglets (commandes en attente / messages non lus)
+function updateNavBadges() {
+    document.querySelectorAll(".nav-btn").forEach(btn => {
+        const tabId = btn.dataset.tab;
+        const badge = btn.querySelector(".nav-badge");
+        if (!badge) return;
+        let count = 0;
+        if (tabId === "messagerie") {
+            count = totalMessagesNonLus();
+        } else if (tabId === "barCommandes") {
+            const zones = currentRole === "bar" ? ["bar","vip"] : [currentRole];
+            count = commandes.filter(c => zones.includes(c.emplacement) && c.statut !== "servi").length;
+        } else if (tabId === "hotelPiscineCommandes") {
+            count = commandes.filter(c => c.emplacement === "piscine" && c.statut !== "servi").length;
+        }
+        if (count > 0) { badge.style.display = "inline-block"; badge.textContent = count > 99 ? "99+" : count; }
+        else { badge.style.display = "none"; }
+    });
+}
+
+// ================================================================
+// 5. DASHBOARD ADMIN & GESTION
+// ================================================================
+function renderAdminDashboard() {
+    const container = document.getElementById("adminDash");
+    if (!container) return;
+    const caBar = ventesBar.filter(v=>v.emplacement==="bar").reduce((s,v)=>s+parseFloat(v.total),0);
+    const caPiscine = ventesBar.filter(v=>v.emplacement==="piscine").reduce((s,v)=>s+parseFloat(v.total),0);
+    const caPiscineSessions = ventesPiscineSessions.reduce((s,v)=>s+v.total,0);
+    const caVIP = ventesBar.filter(v=>v.emplacement==="vip").reduce((s,v)=>s+parseFloat(v.total),0);
+    const caMarket = ventesMarket.reduce((s,v)=>s+parseFloat(v.total),0);
+    const caBarber = ventesBarber.reduce((s,v)=>s+v.montant,0);
+    const totalCA = caBar + caPiscine + caPiscineSessions + caVIP + caMarket + caBarber;
+    const nbResa = reservationsHotel.length;
+    const nbTablesOuvertes = comptesTables.filter(c=>c.statut==="ouvert").length;
+    container.innerHTML = `
+        <div class="summary">📊 Synthèse Complexe La Casa Del Shei</div>
+        <div class="dashboard-stats">
+            <div class="stat-card"><div class="stat-number">${totalCA.toFixed(2)} $</div><div>CA global (${Math.round(totalCA*tauxChange).toLocaleString('fr-FR')} HTG)</div></div>
+            <div class="stat-card"><div class="stat-number">${caBar.toFixed(2)} $</div><div>Bar</div></div>
+            <div class="stat-card"><div class="stat-number">${caPiscine.toFixed(2)} $</div><div>Bar Piscine</div></div>
+            <div class="stat-card"><div class="stat-number">${caPiscineSessions.toFixed(2)} $</div><div>Séances Piscine</div></div>
+            <div class="stat-card"><div class="stat-number">${caVIP.toFixed(2)} $</div><div>VIP</div></div>
+            <div class="stat-card"><div class="stat-number">${caMarket.toFixed(2)} $</div><div>Market</div></div>
+            <div class="stat-card"><div class="stat-number">${caBarber.toFixed(2)} $</div><div>Barber Shop</div></div>
+            <div class="stat-card"><div class="stat-number">${nbResa}</div><div>Réservations hôtel</div></div>
+            <div class="stat-card"><div class="stat-number">${nbTablesOuvertes}</div><div>Tables ouvertes</div></div>
+        </div>
+        <button id="globalReset" class="danger-btn">🔁 Réinitialiser toutes les données</button>
+    `;
+    document.getElementById("globalReset")?.addEventListener("click", () => {
+        if(confirm("Toutes les données seront effacées (sauf comptes par défaut).")) {
+            localStorage.removeItem("shishi_complex_v3");
+            location.reload();
+        }
+    });
+}
+
+function renderTauxChange() {
+    const container = document.getElementById("manageTaux");
+    if(!container) return;
+    container.innerHTML = `<div class="summary">💱 Taux de change du jour — utilisé pour convertir tous les montants entre Dollars ($) et Gourdes (HTG). Valeur par défaut : 130 HTG pour 1 $.</div>
+    <div class="card-grid">
+    <div class="card"><h3>Taux actuel</h3>
+        <div style="font-size:1.8rem;font-weight:800;">1 $ = <span id="tauxActuelValeur">${tauxChange}</span> HTG</div>
+        <label style="font-size:0.85rem;color:#64748b;margin-top:1rem;display:block;">Nouveau taux (HTG pour 1 $)</label>
+        <input id="nouveauTaux" type="number" step="0.01" placeholder="ex: 130" value="${tauxChange}">
+        <button id="btnMajTaux">Mettre à jour le taux</button>
+        <div id="tauxMsg" style="color:#16a34a;font-weight:600;"></div>
+    </div>
+    <div class="card"><h3>🧮 Convertisseur rapide</h3>
+        <input id="convUsd" type="number" placeholder="Montant en $">
+        <div id="convResult" style="font-weight:700;margin-top:0.5rem;"></div>
+    </div>
+    </div>`;
+    document.getElementById("btnMajTaux")?.addEventListener("click", () => {
+        const val = parseFloat(document.getElementById("nouveauTaux").value);
+        const msg = document.getElementById("tauxMsg");
+        if(isNaN(val) || val<=0) { msg.style.color="#dc2626"; msg.textContent = "⚠️ Taux invalide."; return; }
+        tauxChange = val;
+        saveAllData();
+        document.getElementById("tauxActuelValeur").textContent = tauxChange;
+        msg.style.color = "#16a34a";
+        msg.textContent = "✔ Taux mis à jour : 1 $ = " + tauxChange + " HTG";
+    });
+    document.getElementById("convUsd")?.addEventListener("input", (e) => {
+        const val = parseFloat(e.target.value);
+        document.getElementById("convResult").textContent = isNaN(val) ? "" : formatMontantTexte(val);
+    });
+}
+
+function renderReglagesPiscine(tabId) {
+    tabId = tabId || "manageReglagesPiscine";
+    const container = document.getElementById(tabId);
+    if(!container) return;
+    container.innerHTML = `<div class="summary">🏊 Réglages du service Piscine — le prix est calculé PAR PERSONNE. Pour un groupe, une personne est gratuite toutes les X personnes (ex: 12 personnes = 11 payantes + 1 gratuite). L'admin peut en plus autoriser un rabais groupe supplémentaire.</div>
+    <div class="card-grid">
+    <div class="card"><h3>💵 Prix par personne</h3>
+        <div style="font-size:1.4rem;font-weight:800;" id="pxActuel">${formatMontantTexte(prixSeancePiscine)}</div>
+        <label style="font-size:0.85rem;color:#64748b;">Nouveau prix par personne ($)</label>
+        <input id="nvPrixPiscine" type="number" step="0.01" value="${prixSeancePiscine}">
+        <button id="btnMajPrixPiscine">Mettre à jour</button>
+    </div>
+    <div class="card"><h3>🎁 Règle de gratuité groupe</h3>
+        <div style="font-size:1.2rem;font-weight:800;" id="seuilActuel">1 gratuite / ${seuilGratuitGroupe} personnes</div>
+        <label style="font-size:0.85rem;color:#64748b;">Taille de groupe pour 1 gratuite (ex: 12)</label>
+        <input id="nvSeuilGroupe" type="number" min="2" step="1" value="${seuilGratuitGroupe}">
+        <button id="btnMajSeuil">Mettre à jour</button>
+    </div>
+    <div class="card"><h3>🏷️ Rabais groupe (optionnel)</h3>
+        <div style="font-size:1.2rem;font-weight:800;" id="rabaisActuel">${rabaisGroupePourcent}%</div>
+        <label style="font-size:0.85rem;color:#64748b;">Rabais supplémentaire autorisé pour les groupes (%)</label>
+        <input id="nvRabaisGroupe" type="number" min="0" max="100" step="1" value="${rabaisGroupePourcent}">
+        <button id="btnMajRabais">Mettre à jour</button>
+        <p style="font-size:0.8rem;color:#64748b;">Le personnel pourra choisir d'appliquer ou non ce rabais lors de l'encaissement d'un groupe.</p>
+    </div>
+    </div>
+    <div id="reglagesPiscineMsg" style="color:#16a34a;font-weight:600;margin-top:1rem;"></div>`;
+    const msg = () => document.getElementById("reglagesPiscineMsg");
+    document.getElementById("btnMajPrixPiscine")?.addEventListener("click", () => {
+        const val = parseFloat(document.getElementById("nvPrixPiscine").value);
+        if(isNaN(val) || val<0) { msg().style.color="#dc2626"; msg().textContent="⚠️ Prix invalide."; return; }
+        prixSeancePiscine = val; saveAllData();
+        document.getElementById("pxActuel").textContent = formatMontantTexte(prixSeancePiscine);
+        msg().style.color="#16a34a"; msg().textContent = "✔ Prix par personne mis à jour.";
+    });
+    document.getElementById("btnMajSeuil")?.addEventListener("click", () => {
+        const val = parseInt(document.getElementById("nvSeuilGroupe").value);
+        if(isNaN(val) || val<2) { msg().style.color="#dc2626"; msg().textContent="⚠️ Valeur invalide (minimum 2)."; return; }
+        seuilGratuitGroupe = val; saveAllData();
+        document.getElementById("seuilActuel").textContent = `1 gratuite / ${seuilGratuitGroupe} personnes`;
+        msg().style.color="#16a34a"; msg().textContent = "✔ Règle de gratuité mise à jour.";
+    });
+    document.getElementById("btnMajRabais")?.addEventListener("click", () => {
+        const val = parseFloat(document.getElementById("nvRabaisGroupe").value);
+        if(isNaN(val) || val<0 || val>100) { msg().style.color="#dc2626"; msg().textContent="⚠️ Le rabais doit être entre 0 et 100%."; return; }
+        rabaisGroupePourcent = val; saveAllData();
+        document.getElementById("rabaisActuel").textContent = rabaisGroupePourcent + "%";
+        msg().style.color="#16a34a"; msg().textContent = "✔ Rabais groupe mis à jour.";
+    });
+}
+
+// ================================================================
+// 5bis. GESTION CONSOLIDÉE : BAR / PISCINE / HÔTEL (un seul onglet admin)
+// ================================================================
+function renderGestionBarPiscineHotel() {
+    const container = document.getElementById("manageBarPiscineHotel");
+    if(!container) return;
+    const sections = [
+        { key: "produits", label: "🍻 Produits Bar & VIP", render: () => renderManageBarProducts("gbphContent") },
+        { key: "comptes", label: "💳 Comptes Tables", render: () => renderComptesTables("gbphContent") },
+        { key: "reglagesPiscine", label: "🏊 Réglages Piscine", render: () => renderReglagesPiscine("gbphContent") },
+        { key: "seancesPiscine", label: "🏊 Séances Piscine", render: () => renderVentePiscineSession("gbphContent") },
+        { key: "chambresGestion", label: "🛏️ Chambres (gestion)", render: () => renderManageChambres("gbphContent") },
+        { key: "chambresDispo", label: "🕒 Disponibilité Chambres", render: () => renderDispoChambres("gbphContent") },
+        { key: "reservations", label: "📅 Réservations Hôtel", render: () => renderHotelResa("gbphContent") },
+        { key: "servicesHotel", label: "🍽️ Services Hôtel (catalogue)", render: () => renderManageHotelServices("gbphContent") },
+        { key: "servicesAppliquer", label: "🧾 Appliquer un service", render: () => renderHotelServices("gbphContent") }
+    ];
+    container.innerHTML = `<div class="summary">🏢 Gestion consolidée : Bar, Piscine et Hôtel</div>
+        <div id="gbphSubNav" style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:1.2rem;"></div>
+        <div id="gbphContent"></div>`;
+    const subNav = document.getElementById("gbphSubNav");
+    sections.forEach((sec, idx) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.textContent = sec.label;
+        btn.style.background = idx === 0 ? "#f97316" : "#334155";
+        btn.addEventListener("click", () => {
+            clearInterval(dispoRefreshInterval);
+            subNav.querySelectorAll("button").forEach(b => b.style.background = "#334155");
+            btn.style.background = "#f97316";
+            sec.render();
+        });
+        subNav.appendChild(btn);
+    });
+    sections[0].render();
+}
+
+// ================================================================
+// 5ter. MESSAGERIE INTERNE ENTRE EMPLOYÉS
+// ================================================================
+function renderMessagerie(tabId) {
+    tabId = tabId || "messagerie";
+    const container = document.getElementById(tabId);
+    if(!container || !currentUser) return;
+    const contacts = employees.filter(e => e.id !== currentUser.id);
+    const tablesOuvertes = comptesTables.filter(c => c.statut === "ouvert");
+    container.innerHTML = `<div class="summary">💬 Messagerie interne — écrivez à un collègue, au canal général, ou directement à une table (le client peut aussi vous répondre depuis sa tablette)</div>
+    <div class="msg-layout">
+        <div class="msg-contacts" id="msgContactsList"></div>
+        <div class="msg-thread">
+            <div id="msgThreadHeader" class="msg-thread-header">📢 Canal général (Tous)</div>
+            <div id="msgThreadBody" class="msg-thread-body"></div>
+            <div class="msg-composer">
+                <input id="msgInput" placeholder="Écrire un message...">
+                <button id="msgSendBtn" type="button">Envoyer</button>
+            </div>
+        </div>
+    </div>`;
+    let contactActif = "all";
+    function estContactTable(val) { return typeof val === "string" && val.indexOf("table:") === 0; }
+    function idTable(val) { return parseInt(val.split(":")[1]); }
+    function nomDe(val) {
+        if (val === "all") return "Tous";
+        if (estContactTable(val)) {
+            const c = comptesTables.find(x => x.id === idTable(val));
+            return c ? `Table ${c.numeroTable} — ${c.clientNom}` : "Table fermée";
+        }
+        const e = employees.find(x => x.id === val);
+        return e ? e.nom : "?";
+    }
+    function messagesDuFil(contactId) {
+        if (contactId === "all") return messages.filter(m => m.toId === "all" && !m.tableId);
+        if (estContactTable(contactId)) { const tid = idTable(contactId); return messages.filter(m => m.tableId === tid); }
+        return messages.filter(m =>
+            !m.tableId && ((m.fromId === currentUser.id && m.toId === contactId) || (m.fromId === contactId && m.toId === currentUser.id))
+        );
+    }
+    function nonLusDe(contactId) {
+        if (contactId === "all") return messages.filter(m => m.toId==="all" && !m.tableId && m.fromId!==currentUser.id && !(m.luPar||[]).includes(currentUser.id)).length;
+        if (estContactTable(contactId)) { const tid = idTable(contactId); return messages.filter(m => m.tableId===tid && m.fromId==="table" && !m.luStaff).length; }
+        return messages.filter(m => !m.tableId && m.fromId===contactId && m.toId===currentUser.id && !m.lu).length;
+    }
+    function refreshContacts() {
+        const listDiv = document.getElementById("msgContactsList");
+        const nbTous = nonLusDe("all");
+        let html = `<div class="msg-contact ${contactActif==='all'?'active':''}" data-contact="all">📢 Tous ${nbTous>0?`<span class="badge-count">${nbTous}</span>`:''}</div>`;
+        if (tablesOuvertes.length) {
+            html += `<div style="font-size:0.72rem;color:#94a3b8;font-weight:700;margin:0.6rem 0 0.2rem;text-transform:uppercase;">🍽️ Tables</div>`;
+            html += tablesOuvertes.map(t => {
+                const key = "table:" + t.id;
+                const nb = nonLusDe(key);
+                return `<div class="msg-contact ${contactActif===key?'active':''}" data-contact="${key}">🍽️ Table ${t.numeroTable} ${nb>0?`<span class="badge-count">${nb}</span>`:''}</div>`;
+            }).join('');
+            html += `<div style="font-size:0.72rem;color:#94a3b8;font-weight:700;margin:0.6rem 0 0.2rem;text-transform:uppercase;">👥 Employés</div>`;
+        }
+        html += contacts.map(c => {
+            const nb = nonLusDe(c.id);
+            return `<div class="msg-contact ${contactActif===c.id?'active':''}" data-contact="${c.id}">${c.nom} ${nb>0?`<span class="badge-count">${nb}</span>`:''}</div>`;
+        }).join('');
+        listDiv.innerHTML = html;
+        listDiv.querySelectorAll("[data-contact]").forEach(el => {
+            el.addEventListener("click", () => {
+                const val = el.dataset.contact;
+                contactActif = (val === "all" || estContactTable(val)) ? val : parseInt(val);
+                document.getElementById("msgThreadHeader").textContent = contactActif==="all" ? "📢 Canal général (Tous)" : `💬 ${nomDe(contactActif)}`;
+                marquerLu(contactActif);
+                refreshThread();
+                refreshContacts();
+            });
+        });
+    }
+    function marquerLu(contactId) {
+        if (contactId === "all") {
+            messages.forEach(m => { if(m.toId==="all" && !m.tableId) { m.luPar = m.luPar || []; if(!m.luPar.includes(currentUser.id)) m.luPar.push(currentUser.id); } });
+        } else if (estContactTable(contactId)) {
+            const tid = idTable(contactId);
+            messages.forEach(m => { if(m.tableId===tid && m.fromId==="table") m.luStaff = true; });
+        } else {
+            messages.forEach(m => { if(!m.tableId && m.fromId===contactId && m.toId===currentUser.id) m.lu = true; });
+        }
+        saveAllData();
+    }
+    function refreshThread() {
+        const body = document.getElementById("msgThreadBody");
+        const fil = messagesDuFil(contactActif).slice().sort((a,b)=>a.id-b.id);
+        body.innerHTML = fil.map(m => `
+            <div class="msg-bubble ${m.fromId===currentUser.id ? 'mine':'theirs'}">
+                <div class="msg-meta">${m.fromNom} · ${m.date}</div>
+                <div>${(m.text||"").replace(/</g,"&lt;")}</div>
+            </div>
+        `).join('') || `<em style="color:#94a3b8;">Aucun message pour l'instant</em>`;
+        body.scrollTop = body.scrollHeight;
+    }
+    document.getElementById("msgSendBtn")?.addEventListener("click", () => {
+        const input = document.getElementById("msgInput");
+        const text = input.value.trim();
+        if(!text) return;
+        if (estContactTable(contactActif)) {
+            const tid = idTable(contactActif);
+            messages.push({ id: Date.now(), tableId: tid, fromId: currentUser.id, fromNom: currentUser.nom, toId: "table", text, date: new Date().toLocaleString(), luStaff: true, luClient: false });
+        } else {
+            messages.push({ id: Date.now(), fromId: currentUser.id, fromNom: currentUser.nom, toId: contactActif, text, date: new Date().toLocaleString(), lu: false, luPar: contactActif==="all" ? [currentUser.id] : undefined });
+        }
+        saveAllData();
+        input.value = "";
+        refreshThread();
+        refreshContacts();
+    });
+    document.getElementById("msgInput")?.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") document.getElementById("msgSendBtn").click();
+    });
+    marquerLu("all");
+    refreshContacts();
+    refreshThread();
+}
+function totalMessagesNonLus() {
+    if (!currentUser) return 0;
+    const directs = messages.filter(m => !m.tableId && m.toId===currentUser.id && !m.lu).length;
+    const generaux = messages.filter(m => !m.tableId && m.toId==="all" && m.fromId!==currentUser.id && !(m.luPar||[]).includes(currentUser.id)).length;
+    const tablesMsg = messages.filter(m => m.tableId && m.fromId==="table" && !m.luStaff).length;
+    return directs + generaux + tablesMsg;
+}
+
+
+function renderManageEmployees() {
+    const container = document.getElementById("manageEmployees");
+    if(!container) return;
+    const rolesDisponibles = [
+        { value: "admin", label: "Admin" },
+        { value: "hotel", label: "Réceptionniste (Bar Piscine/Hôtel)" },
+        { value: "bar", label: "Bar & VIP" },
+        { value: "barber", label: "Barber" },
+        { value: "market", label: "Market" }
+    ];
+    container.innerHTML = `<div class="summary">👥 Gestion des employés — un employé peut avoir un ou plusieurs rôles</div>
+    <div class="card-grid"><div class="card"><h3>➕ Ajouter employé</h3>
+    <input id="empNom" placeholder="Nom"><input id="empUsername" placeholder="Login"><input id="empPassword" type="password" placeholder="Mot de passe">
+    <label style="font-size:0.85rem;color:#64748b;display:block;margin-top:0.5rem;">Rôle(s) — cocher un ou plusieurs</label>
+    <div id="empRolesCheckboxes" style="display:flex;flex-wrap:wrap;gap:0.6rem;margin:0.4rem 0;">
+        ${rolesDisponibles.map(r => `<label style="display:flex;align-items:center;gap:0.3rem;background:#f1f5f9;padding:0.3rem 0.7rem;border-radius:1rem;">
+            <input type="checkbox" class="empRoleCheckbox" value="${r.value}" style="width:auto;margin:0;"> ${r.label}
+        </label>`).join('')}
+    </div>
+    <button id="addEmployee">Ajouter</button></div>
+    <div class="card"><h3>📋 Liste employés</h3><div id="empList"></div></div></div>`;
+    const labelOf = (v) => (rolesDisponibles.find(r=>r.value===v)||{}).label || v;
+    function refreshList() {
+        const listDiv = document.getElementById("empList");
+        if(listDiv) listDiv.innerHTML = employees.map(e => `<div class="emp-row">
+            <div><strong>${e.nom}</strong> — Login: <code>${e.username}</code> — Mot de passe: <code class="pw-hidden" data-pw="${e.username+'_'+e.id}">••••••</code>
+            <button type="button" class="pw-toggle" data-pwval="${e.password}" data-target="${e.username+'_'+e.id}">👁️</button>
+            <br><span style="color:#64748b;font-size:0.85rem;">${(e.roles||[]).map(labelOf).join(', ') || 'aucun rôle'}</span></div>
+            <button class="danger-btn" data-id="${e.id}">Supprimer</button>
+        </div>`).join('');
+        listDiv.querySelectorAll("[data-id]").forEach(btn => {
+            btn.addEventListener("click", async () => {
+                const id = parseInt(btn.dataset.id);
+                if (!confirm("Supprimer cet employé ?")) return;
+                try {
+                    const res = await fetch(`${API_BASE}/api/employees/${id}`, { method: "DELETE" });
+                    if (!res.ok) { alert("Erreur lors de la suppression."); return; }
+                    employees = employees.filter(emp => emp.id !== id);
+                    refreshList();
+                } catch(e) { alert("Impossible de contacter le serveur."); }
+            });
+        });
+        listDiv.querySelectorAll(".pw-toggle").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const codeEl = listDiv.querySelector(`code[data-pw="${btn.dataset.target}"]`);
+                if (!codeEl) return;
+                const showing = codeEl.dataset.showing === "1";
+                codeEl.textContent = showing ? "••••••" : btn.dataset.pwval;
+                codeEl.dataset.showing = showing ? "0" : "1";
+                btn.textContent = showing ? "👁️" : "🙈";
+            });
+        });
+    }
+    document.getElementById("addEmployee")?.addEventListener("click", async () => {
+        const nom = document.getElementById("empNom").value;
+        const username = document.getElementById("empUsername").value;
+        const password = document.getElementById("empPassword").value;
+        const roles = Array.from(document.querySelectorAll(".empRoleCheckbox:checked")).map(cb => cb.value);
+        if(!nom || !username || !password) return alert("Remplissez tous les champs");
+        if(roles.length === 0) return alert("Cochez au moins un rôle");
+        try {
+            const res = await fetch(`${API_BASE}/api/employees`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ nom, username, password, roles })
+            });
+            if (!res.ok) {
+                const err = await res.json().catch(()=>({}));
+                alert(err.error || "Erreur lors de la création (login déjà pris ?)");
+                return;
+            }
+            const created = await res.json();
+            employees.push(created);
+            refreshList();
+            document.getElementById("empNom").value = "";
+            document.getElementById("empUsername").value = "";
+            document.getElementById("empPassword").value = "";
+            document.querySelectorAll(".empRoleCheckbox").forEach(cb => cb.checked = false);
+        } catch(e) { alert("Impossible de contacter le serveur."); }
+    });
+    refreshList();
+}
+
+function renderManageBarberServices() {
+    const container = document.getElementById("manageBarberServices");
+    if(!container) return;
+    container.innerHTML = `<div class="summary">💈 Services Barber</div><div class="card-grid"><div class="card"><h3>➕ Nouveau service</h3><input id="servNom" placeholder="Nom"><input id="servPrix" type="number" placeholder="Prix"><button id="addService">Ajouter</button></div><div class="card"><h3>📋 Services existants</h3><div id="listServices"></div></div></div>`;
+    function refresh() {
+        const listDiv = document.getElementById("listServices");
+        if(listDiv) listDiv.innerHTML = servicesBarber.map(s => `<div>${s.nom} - ${formatMontant(s.prix)} <button class="danger-btn" data-id="${s.id}">Supprimer</button></div>`).join('');
+        listDiv.querySelectorAll("[data-id]").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const id = parseInt(btn.dataset.id);
+                servicesBarber = servicesBarber.filter(s => s.id !== id);
+                saveAllData(); refresh();
+            });
+        });
+    }
+    document.getElementById("addService")?.addEventListener("click", () => {
+        const nom = document.getElementById("servNom").value;
+        const prix = parseFloat(document.getElementById("servPrix").value);
+        if(!nom || isNaN(prix)) return;
+        servicesBarber.push({ id: Date.now(), nom, prix });
+        saveAllData(); refresh();
+    });
+    refresh();
+}
+
+function renderManageCoiffeurs() {
+    const container = document.getElementById("manageCoiffeurs");
+    if(!container) return;
+    container.innerHTML = `<div class="summary">✂️ Coiffeurs avec numéro de chaise</div><div class="card-grid"><div class="card"><h3>➕ Ajouter coiffeur</h3><input id="coiffeurNom" placeholder="Nom"><input id="coiffeurChaise" type="number" placeholder="Numéro chaise"><button id="addCoiffeur">Ajouter</button></div><div class="card"><h3>📋 Liste</h3><div id="listCoiffeurs"></div></div></div>`;
+    function refresh() {
+        const listDiv = document.getElementById("listCoiffeurs");
+        if(listDiv) listDiv.innerHTML = coiffeurs.map(c => `<div>${c.nom} - Chaise n°${c.numChaise} <button class="danger-btn" data-id="${c.id}">Supprimer</button></div>`).join('');
+        listDiv.querySelectorAll("[data-id]").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const id = parseInt(btn.dataset.id);
+                coiffeurs = coiffeurs.filter(c => c.id !== id);
+                saveAllData(); refresh();
+            });
+        });
+    }
+    document.getElementById("addCoiffeur")?.addEventListener("click", () => {
+        const nom = document.getElementById("coiffeurNom").value;
+        const numChaise = parseInt(document.getElementById("coiffeurChaise").value);
+        if(!nom || isNaN(numChaise)) return;
+        coiffeurs.push({ id: Date.now(), nom, numChaise });
+        saveAllData(); refresh();
+    });
+    refresh();
+}
+
+function renderManageBarProducts(tabId) {
+    tabId = tabId || "manageBarProducts";
+    const container = document.getElementById(tabId);
+    if(!container) return;
+    container.innerHTML = `<div class="summary">🍻 Produits — le stock "Bar" est partagé entre le Bar classique et le Bar Piscine</div><div class="card-grid"><div class="card"><h3>➕ Ajouter produit</h3><input id="prodNom" placeholder="Nom"><input id="prodPrix" type="number" placeholder="Prix"><input id="prodStock" type="number" placeholder="Stock"><select id="prodZone"><option value="bar">Bar & Piscine (stock partagé)</option><option value="vip">VIP</option></select><button id="addProduct">Ajouter</button></div><div class="card"><h3>📋 Produits</h3><div id="listProducts"></div></div></div>`;
+    function refresh() {
+        const listDiv = document.getElementById("listProducts");
+        if(listDiv) listDiv.innerHTML = produitsBar.map(p => `<div>${p.nom} - ${formatMontant(p.prix)} - Stock:${p.stock} (${p.zone==="bar"?"Bar & Piscine":"VIP"}) <button class="danger-btn" data-id="${p.id}">Supprimer</button></div>`).join('');
+        listDiv.querySelectorAll("[data-id]").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const id = parseInt(btn.dataset.id);
+                produitsBar = produitsBar.filter(p => p.id !== id);
+                saveAllData(); refresh();
+            });
+        });
+    }
+    document.getElementById("addProduct")?.addEventListener("click", () => {
+        const nom = document.getElementById("prodNom").value;
+        const prix = parseFloat(document.getElementById("prodPrix").value);
+        const stock = parseInt(document.getElementById("prodStock").value);
+        const zone = document.getElementById("prodZone").value;
+        if(!nom || isNaN(prix) || isNaN(stock)) return;
+        produitsBar.push({ id: Date.now(), nom, prix, zone, stock });
+        saveAllData(); refresh();
+    });
+    refresh();
+}
+
+function renderManageMarket() {
+    const container = document.getElementById("manageMarket");
+    if(!container) return;
+    container.innerHTML = `<div class="summary">🛒 Articles du mini market</div><div class="card-grid"><div class="card"><h3>➕ Ajouter article</h3><input id="artNom" placeholder="Nom"><input id="artPrix" type="number" placeholder="Prix"><input id="artStock" type="number" placeholder="Stock"><input id="artCode" placeholder="Code barre"><button id="addArticle">Ajouter</button></div><div class="card"><h3>📋 Liste</h3><div id="listArticles"></div></div></div>`;
+    function refresh() {
+        const listDiv = document.getElementById("listArticles");
+        if(listDiv) listDiv.innerHTML = articlesMarket.map(a => `<div>${a.nom} - ${formatMontant(a.prix)} (stock:${a.stock}) code:${a.codeBarre} <button class="danger-btn" data-id="${a.id}">Supprimer</button></div>`).join('');
+        listDiv.querySelectorAll("[data-id]").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const id = parseInt(btn.dataset.id);
+                articlesMarket = articlesMarket.filter(a => a.id !== id);
+                saveAllData(); refresh();
+            });
+        });
+    }
+    document.getElementById("addArticle")?.addEventListener("click", () => {
+        const nom = document.getElementById("artNom").value;
+        const prix = parseFloat(document.getElementById("artPrix").value);
+        const stock = parseInt(document.getElementById("artStock").value);
+        const codeBarre = document.getElementById("artCode").value;
+        if(!nom || isNaN(prix) || isNaN(stock)) return;
+        articlesMarket.push({ id: Date.now(), nom, prix, stock, codeBarre });
+        saveAllData(); refresh();
+    });
+    refresh();
+}
+
+function renderManageHotelServices(tabId) {
+    tabId = tabId || "manageHotelServices";
+    const container = document.getElementById(tabId);
+    if(!container) return;
+    container.innerHTML = `<div class="summary">🏨 Services hôtel (moment/soirée)</div><div class="card-grid"><div class="card"><h3>➕ Ajouter service</h3><input id="hsNom" placeholder="Nom"><input id="hsPrix" type="number" placeholder="Prix"><select id="hsType"><option value="moment">Moment</option><option value="soiree">Soirée</option></select><button id="addHService">Ajouter</button></div><div class="card"><h3>📋 Services</h3><div id="listHServices"></div></div></div>`;
+    function refresh() {
+        const listDiv = document.getElementById("listHServices");
+        if(listDiv) listDiv.innerHTML = servicesHotel.map(s => `<div>${s.nom} - ${formatMontant(s.prix)} (${s.type}) <button class="danger-btn" data-id="${s.id}">Supprimer</button></div>`).join('');
+        listDiv.querySelectorAll("[data-id]").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const id = parseInt(btn.dataset.id);
+                servicesHotel = servicesHotel.filter(s => s.id !== id);
+                saveAllData(); refresh();
+            });
+        });
+    }
+    document.getElementById("addHService")?.addEventListener("click", () => {
+        const nom = document.getElementById("hsNom").value;
+        const prix = parseFloat(document.getElementById("hsPrix").value);
+        const type = document.getElementById("hsType").value;
+        if(!nom || isNaN(prix)) return;
+        servicesHotel.push({ id: Date.now(), nom, prix, type });
+        saveAllData(); refresh();
+    });
+    refresh();
+}
+
+function renderManageChambres(tabId) {
+    tabId = tabId || "manageChambres";
+    const container = document.getElementById(tabId);
+    if(!container) return;
+    container.innerHTML = `<div class="summary">🛏️ Gestion des chambres — 4 tarifs par chambre : Moment (2h), Nuit, Semaine, Mois</div><div class="card-grid"><div class="card"><h3>➕ Ajouter chambre</h3>
+    <input id="chNumero" placeholder="Numéro"><input id="chType" placeholder="Type">
+    <label style="font-size:0.8rem;color:#64748b;">Tarif Moment (2h) — $</label><input id="chPrixMoment" type="number" placeholder="Ex: 15">
+    <label style="font-size:0.8rem;color:#64748b;">Tarif par nuit — $</label><input id="chPrix" type="number" placeholder="Ex: 50">
+    <label style="font-size:0.8rem;color:#64748b;">Tarif par semaine — $</label><input id="chPrixSemaine" type="number" placeholder="Ex: 300">
+    <label style="font-size:0.8rem;color:#64748b;">Tarif par mois — $</label><input id="chPrixMois" type="number" placeholder="Ex: 1200">
+    <button id="addChambre">Ajouter</button></div><div class="card"><h3>📋 Liste chambres</h3><div id="listChambres"></div></div></div>`;
+    function refresh() {
+        const listDiv = document.getElementById("listChambres");
+        if(listDiv) listDiv.innerHTML = chambres.map(c => `<div style="margin-bottom:0.6rem;"><strong>${c.numero}</strong> - ${c.type} - ${c.statut}<br>
+            <span style="font-size:0.85rem;color:#64748b;">Moment: ${formatMontant(c.prixMoment)} · Nuit: ${formatMontant(c.prixParNuit)} · Semaine: ${formatMontant(c.prixSemaine)} · Mois: ${formatMontant(c.prixMois)}</span><br>
+            <button data-lib="${c.id}">Libérer</button><button class="danger-btn" data-id="${c.id}">Supprimer</button></div>`).join('');
+        listDiv.querySelectorAll("[data-id]").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const id = parseInt(btn.dataset.id);
+                chambres = chambres.filter(c => c.id !== id);
+                saveAllData(); refresh();
+            });
+        });
+        listDiv.querySelectorAll("[data-lib]").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const id = parseInt(btn.dataset.lib);
+                const ch = chambres.find(c=>c.id===id);
+                if(ch){ ch.statut = "libre"; ch.checkOut = null; saveAllData(); refresh(); }
+            });
+        });
+    }
+    document.getElementById("addChambre")?.addEventListener("click", () => {
+        const numero = document.getElementById("chNumero").value;
+        const type = document.getElementById("chType").value;
+        const prix = parseFloat(document.getElementById("chPrix").value);
+        const prixMoment = parseFloat(document.getElementById("chPrixMoment").value);
+        const prixSemaine = parseFloat(document.getElementById("chPrixSemaine").value);
+        const prixMois = parseFloat(document.getElementById("chPrixMois").value);
+        if(!numero || !type || isNaN(prix)) return alert("Numéro, type et tarif/nuit sont requis");
+        chambres.push({
+            id: Date.now(), numero, type,
+            prixMoment: isNaN(prixMoment) ? Math.round(prix*0.3) : prixMoment,
+            prixParNuit: prix,
+            prixSemaine: isNaN(prixSemaine) ? Math.round(prix*6) : prixSemaine,
+            prixMois: isNaN(prixMois) ? Math.round(prix*25) : prixMois,
+            statut: "libre", checkOut: null
+        });
+        saveAllData(); refresh();
+    });
+    refresh();
+}
+
+// ================================================================
+// 6. DISPONIBILITÉ DES CHAMBRES (temps restant en direct)
+// ================================================================
+function renderDispoChambres(tabId) {
+    const container = document.getElementById(tabId);
+    if (!container) return;
+    container.innerHTML = `<div class="summary">🕒 Disponibilité des chambres en temps réel</div><div id="roomGrid_${tabId}" class="room-grid"></div>`;
+    function paint() {
+        const grid = document.getElementById(`roomGrid_${tabId}`);
+        if (!grid) { clearInterval(dispoRefreshInterval); return; }
+        grid.innerHTML = chambres.map(c => {
+            const libre = c.statut === "libre";
+            let sousTitre = "Disponible";
+            if (!libre) {
+                if (c.checkOut) {
+                    const rem = new Date(c.checkOut).getTime() - Date.now();
+                    sousTitre = "Reste " + formatRemaining(rem);
+                } else {
+                    sousTitre = "Occupée";
+                }
+            }
+            return `<div class="room-card ${libre?'libre':'occupee'}">
+                <div class="roomnum">${c.numero}</div>
+                <div>${c.type}</div>
+                <div style="margin-top:0.4rem; font-size:0.85rem;">${sousTitre}</div>
+            </div>`;
+        }).join('');
+    }
+    paint();
+    clearInterval(dispoRefreshInterval);
+    dispoRefreshInterval = setInterval(paint, 15000);
+}
+
+function renderHotelResa(tabId) {
+    tabId = tabId || "hotelResa";
+    const container = document.getElementById(tabId);
+    if(!container) return;
+    const dureeLabels = { moment: "Moment (2h)", nuit: "Nuit(s)", semaine: "Semaine(s)", mois: "Mois" };
+    container.innerHTML = `<div class="summary">🏨 Réservations — préciser le nombre de personnes et la durée du séjour (moment de 2h, nuit(s), semaine(s) ou mois, comme sur un Airbnb)</div>
+    <div id="resaErrorMsg" style="color:#dc2626;font-weight:600;"></div>
+    <div class="card-grid"><div class="card"><h3>➕ Nouvelle réservation (check-in immédiat)</h3>
+    <input id="resaClient" placeholder="Nom du client">
+    <select id="resaChambre"></select>
+    <label style="font-size:0.8rem;color:#64748b;">Nombre de personnes</label>
+    <input id="resaPersonnes" type="number" min="1" value="1">
+    <label style="font-size:0.8rem;color:#64748b;">Type de séjour</label>
+    <select id="resaTypeDuree">
+        <option value="moment">Moment (2h)</option>
+        <option value="nuit" selected>Nuit(s)</option>
+        <option value="semaine">Semaine(s)</option>
+        <option value="mois">Mois</option>
+    </select>
+    <div id="resaQuantiteWrap">
+        <label style="font-size:0.8rem;color:#64748b;" id="resaQuantiteLabel">Nombre de nuits</label>
+        <input id="resaQuantite" type="number" min="1" value="1">
+    </div>
+    <select id="resaType"><option value="presentiel">Présentiel</option><option value="enligne">En ligne</option></select>
+    <div id="resaRecap" class="summary" style="margin-top:0.6rem;"></div>
+    <button id="btnReserver" type="button">Réserver & attribuer</button>
+    </div>
+    <div class="card"><h3>📅 Réservations actives</h3><div id="listResaHotel"></div></div></div>`;
+
+    function chambreSelectionnee() {
+        const id = parseInt(document.getElementById("resaChambre").value);
+        return chambres.find(c => c.id === id);
+    }
+    function calculerSejour() {
+        const type = document.getElementById("resaTypeDuree").value;
+        let qte = parseInt(document.getElementById("resaQuantite").value);
+        if (isNaN(qte) || qte < 1) qte = 1;
+        const ch = chambreSelectionnee();
+        const tarifs = { moment: ch?.prixMoment, nuit: ch?.prixParNuit, semaine: ch?.prixSemaine, mois: ch?.prixMois };
+        const montant = ch ? (tarifs[type] || 0) * qte : 0;
+        const heuresParUnite = { moment: 2, nuit: 24, semaine: 24*7, mois: 24*30 };
+        const dateDebut = new Date();
+        const dateFin = new Date(dateDebut.getTime() + qte * heuresParUnite[type] * 3600 * 1000);
+        return { type, qte, montant, dateDebut, dateFin };
+    }
+    function refreshRecap() {
+        document.getElementById("resaQuantiteLabel").textContent = "Nombre de " + { moment: "moments (2h chacun)", nuit: "nuits", semaine: "semaines", mois: "mois" }[document.getElementById("resaTypeDuree").value];
+        const s = calculerSejour();
+        document.getElementById("resaRecap").innerHTML = `Départ prévu : <strong>${s.dateFin.toLocaleString()}</strong><br>Total à payer : <strong>${formatMontant(s.montant)}</strong>`;
+    }
+    document.getElementById("resaTypeDuree")?.addEventListener("change", refreshRecap);
+    document.getElementById("resaQuantite")?.addEventListener("input", refreshRecap);
+    document.getElementById("resaChambre")?.addEventListener("change", refreshRecap);
+
+    function refresh() {
+        const selectChambre = document.getElementById("resaChambre");
+        const zoneSelection = selectChambre ? selectChambre.value : null;
+        if(selectChambre) selectChambre.innerHTML = chambres.map(c => `<option value="${c.id}" ${c.statut !== "libre" ? "disabled" : ""}>${c.numero} - ${c.type}${c.statut!=="libre"?" [occupée]":""}</option>`).join('');
+        const listDiv = document.getElementById("listResaHotel");
+        if(listDiv) listDiv.innerHTML = reservationsHotel.slice().reverse().map(r => {
+            const ch = chambres.find(c=>c.id===r.chambreId);
+            const rem = ch && ch.checkOut ? formatRemaining(new Date(ch.checkOut).getTime()-Date.now()) : "-";
+            return `<div><strong>${r.clientNom}</strong> (${r.nombrePersonnes||1} pers.) - Chambre ${ch?.numero||'?'} - ${r.quantiteDuree||1} ${dureeLabels[r.typeDuree]||''} - ${r.typeResa} - ${formatMontant(r.montant||0)}<br>Départ: ${new Date(r.dateFin).toLocaleString()} - ${rem}</div>`;
+        }).join('');
+        refreshRecap();
+    }
+    document.getElementById("btnReserver")?.addEventListener("click", () => {
+        const errDiv = document.getElementById("resaErrorMsg");
+        errDiv.textContent = "";
+        const client = document.getElementById("resaClient").value.trim();
+        const chambreId = parseInt(document.getElementById("resaChambre").value);
+        const nombrePersonnes = parseInt(document.getElementById("resaPersonnes").value) || 1;
+        const typeResa = document.getElementById("resaType").value;
+        const chambre = chambres.find(c=>c.id===chambreId);
+        if(!client) { errDiv.textContent = "⚠️ Le nom du client est requis."; return; }
+        if(!chambre || chambre.statut !== "libre") { errDiv.textContent = "⚠️ Chambre non disponible."; return; }
+        const s = calculerSejour();
+        chambre.statut = "occupee";
+        chambre.checkOut = s.dateFin.toISOString();
+        reservationsHotel.push({
+            id: Date.now(), clientNom: client, chambreId, nombrePersonnes,
+            typeDuree: s.type, quantiteDuree: s.qte, montant: s.montant,
+            dateDebut: s.dateDebut.toISOString(), dateFin: s.dateFin.toISOString(),
+            statut: "en_cours", typeResa
+        });
+        saveAllData();
+        document.getElementById("resaClient").value = "";
+        document.getElementById("resaPersonnes").value = "1";
+        document.getElementById("resaQuantite").value = "1";
+        refresh();
+        printReceipt("Réservation Hôtel", [`Client: ${client}`, `Chambre: ${chambre.numero}`, `Personnes: ${nombrePersonnes}`, `Durée: ${s.qte} ${dureeLabels[s.type]}`, `Départ prévu: ${s.dateFin.toLocaleString()}`], s.montant);
+    });
+    refresh();
+}
+
+function renderHotelServices(tabId) {
+    tabId = tabId || "hotelServices";
+    const container = document.getElementById(tabId);
+    if(!container) return;
+    container.innerHTML = `<div class="summary">🍽️ Services hôtel (ajouter à une réservation)</div>
+    <div class="card-grid"><div class="card"><h3>➕ Ajouter service</h3><select id="selResa"></select><select id="selService"></select><input id="qteService" type="number" value="1"><button id="addServiceToResa">Ajouter</button></div>
+    <div class="card"><h3>📋 Services consommés</h3><div id="listServicesResa"></div></div></div>`;
+    function refresh() {
+        const selResa = document.getElementById("selResa");
+        if(selResa) selResa.innerHTML = reservationsHotel.map(r => {
+            const ch = chambres.find(c=>c.id===r.chambreId);
+            return `<option value="${r.id}">${r.clientNom} (chambre ${ch?.numero||'?'})</option>`;
+        }).join('');
+        const selService = document.getElementById("selService");
+        if(selService) selService.innerHTML = servicesHotel.map(s => `<option value="${s.id}">${s.nom} - ${s.prix.toFixed(2)} $ (${s.type})</option>`).join('');
+        const listDiv = document.getElementById("listServicesResa");
+        if(listDiv) listDiv.innerHTML = reservationServices.map(rs => {
+            const resa = reservationsHotel.find(r=>r.id===rs.reservationId);
+            const serv = servicesHotel.find(s=>s.id===rs.serviceId);
+            return `<div>Réservation ${resa?.clientNom} : ${serv?.nom} x${rs.quantite} = ${formatMontant(rs.montant)}</div>`;
+        }).join('');
+    }
+    document.getElementById("addServiceToResa")?.addEventListener("click", () => {
+        const resaId = parseInt(document.getElementById("selResa").value);
+        const serviceId = parseInt(document.getElementById("selService").value);
+        let qte = parseInt(document.getElementById("qteService").value);
+        if(isNaN(qte)) qte=1;
+        const service = servicesHotel.find(s=>s.id===serviceId);
+        if(service) {
+            const montant = service.prix * qte;
+            reservationServices.push({ id: Date.now(), reservationId: resaId, serviceId, quantite: qte, montant });
+            saveAllData(); refresh();
+        }
+    });
+    refresh();
+}
+
+// ================================================================
+// 7. COMPTES TABLES (dépôt du client + attribution du numéro)
+// ================================================================
+function renderComptesTables(tabId, emplacementsAutorises) {
+    const container = document.getElementById(tabId);
+    if(!container) return;
+    const emplacementLabels = { bar: "Bar", piscine: "Bar Piscine", vip: "VIP" };
+    const toutesZones = ["bar", "piscine", "vip"];
+    // emplacementsAutorises peut être : undefined (toutes les zones, ex. admin), une chaîne (zone unique verrouillée,
+    // ex. Piscine), ou un tableau de zones sélectionnables (ex. ["bar","vip"] pour le rôle Bar qui gère aussi le VIP)
+    const zoneUnique = typeof emplacementsAutorises === "string" ? emplacementsAutorises : null;
+    const zonesSelectionnables = Array.isArray(emplacementsAutorises) ? emplacementsAutorises : toutesZones;
+    const zonesFiltre = zoneUnique ? [zoneUnique] : zonesSelectionnables;
+    container.innerHTML = `<div class="summary">💳 Ouverture d'un compte table : le client dépose un montant (en $ ou en HTG), une table lui est attribuée. Il voit ensuite son solde et commande depuis la tablette posée sur la table. Taux du jour : <strong>1 $ = ${tauxChange} HTG</strong></div>
+    <div id="ctErrorMsg" style="color:#dc2626; font-weight:600;"></div>
+    <div class="card-grid">
+    <div class="card"><h3>➕ Ouvrir un compte / attribuer une table</h3>
+    <input id="ctClient" placeholder="Nom du client">
+    <div style="display:flex; gap:0.4rem;">
+        <input id="ctMontant" type="number" step="0.01" placeholder="Montant du dépôt" style="flex:2;">
+        <select id="ctDevise" style="flex:1;"><option value="usd">$</option><option value="htg">HTG</option></select>
+    </div>
+    <div id="ctEquivalent" style="font-size:0.85rem;color:#64748b;"></div>
+    ${zoneUnique
+        ? `<input type="hidden" id="ctEmplacement" value="${zoneUnique}"><div style="font-weight:600;">Zone : ${emplacementLabels[zoneUnique]}</div>`
+        : `<select id="ctEmplacement">${zonesSelectionnables.map(z=>`<option value="${z}">${emplacementLabels[z]}</option>`).join('')}</select>`}
+    <label style="font-size:0.8rem;color:#64748b;">Table attribuée automatiquement</label>
+    <div id="ctNextTable" style="font-weight:700;"></div>
+    <button id="ctOuvrir" type="button">Ouvrir le compte & imprimer</button>
+    </div>
+    <div class="card"><h3>📋 Comptes ouverts${zoneUnique ? " — " + emplacementLabels[zoneUnique] : ""}</h3><div id="ctList"></div></div>
+    </div>`;
+    function nextTable() { const d = tablesDisponibles(); return d.length ? d[0] : null; }
+    function updateEquivalent() {
+        const val = parseFloat(document.getElementById("ctMontant").value);
+        const dev = document.getElementById("ctDevise").value;
+        const eqDiv = document.getElementById("ctEquivalent");
+        if (isNaN(val)) { eqDiv.textContent = ""; return; }
+        if (dev === "usd") eqDiv.textContent = `≈ ${Math.round(val*tauxChange).toLocaleString('fr-FR')} HTG`;
+        else eqDiv.textContent = `≈ ${(val/tauxChange).toFixed(2)} $`;
+    }
+    document.getElementById("ctMontant")?.addEventListener("input", updateEquivalent);
+    document.getElementById("ctDevise")?.addEventListener("change", updateEquivalent);
+    function refresh() {
+        document.getElementById("ctNextTable").textContent = nextTable() ? "Table n° " + nextTable() : "⚠️ Aucune table disponible";
+        const listDiv = document.getElementById("ctList");
+        const comptesAffiches = comptesTables.filter(c=>c.statut==="ouvert" && zonesFiltre.includes(c.emplacement));
+        if(listDiv) listDiv.innerHTML = comptesAffiches.slice().reverse().map(c => `<div><strong>Table ${c.numeroTable}</strong> - ${c.clientNom} (${emplacementLabels[c.emplacement]||c.emplacement}) - Solde: ${formatMontant(c.solde)} <button class="danger-btn" data-close="${c.id}">Clôturer</button></div>`).join('') || "<em>Aucun compte ouvert</em>";
+        listDiv.querySelectorAll("[data-close]").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const id = parseInt(btn.dataset.close);
+                const c = comptesTables.find(x=>x.id===id);
+                if(c && confirm(`Clôturer le compte de la table ${c.numeroTable} ? Solde restant: ${formatMontantTexte(c.solde)}`)) {
+                    c.statut = "ferme";
+                    saveAllData(); refresh();
+                }
+            });
+        });
+    }
+    document.getElementById("ctOuvrir")?.addEventListener("click", () => {
+        const errDiv = document.getElementById("ctErrorMsg");
+        errDiv.textContent = "";
+        const client = document.getElementById("ctClient").value.trim();
+        const saisie = parseFloat(document.getElementById("ctMontant").value);
+        const devise = document.getElementById("ctDevise").value;
+        const emplacement = document.getElementById("ctEmplacement").value;
+        const num = nextTable();
+        if(!client) { errDiv.textContent = "⚠️ Le nom du client est requis."; return; }
+        if(isNaN(saisie) || saisie<=0) { errDiv.textContent = "⚠️ Montant du dépôt invalide."; return; }
+        if(!num) { errDiv.textContent = "⚠️ Plus aucune table disponible."; return; }
+        const montantUsd = devise === "htg" ? (saisie / tauxChange) : saisie;
+        const compte = { id: Date.now(), numeroTable: num, clientNom: client, emplacement, soldeInitial: montantUsd, solde: montantUsd, dateOuverture: new Date().toLocaleString(), statut: "ouvert" };
+        comptesTables.push(compte);
+        saveAllData();
+        // On vide le formulaire et on rafraîchit la liste AVANT l'impression : même si
+        // l'impression échoue sur cet appareil, le compte est bien créé et visible.
+        document.getElementById("ctClient").value = "";
+        document.getElementById("ctMontant").value = "";
+        document.getElementById("ctEquivalent").textContent = "";
+        refresh();
+        printReceipt("Ouverture compte table", [`Client: ${client}`, `Table attribuée: n°${num}`, `Zone: ${emplacementLabels[emplacement]}`, `Dépôt: ${formatMontantTexte(montantUsd)}`], montantUsd);
+    });
+    refresh();
+}
+
+// ================================================================
+// 8. FILE DE COMMANDES (côté personnel bar / piscine / vip)
+// ================================================================
+function renderCommandesQueue(role, tabId) {
+    const container = document.getElementById(tabId);
+    if(!container) return;
+    const zones = Array.isArray(role) ? role : [role]; // ex: "piscine" ou ["bar","vip"]
+    const emplacementLabels = { bar: "Bar", piscine: "Bar Piscine", vip: "VIP" };
+    const zoneTag = (e) => zones.length > 1 ? ` <span style="color:#64748b;font-weight:600;">· ${emplacementLabels[e]||e}</span>` : "";
+    container.innerHTML = `<div class="summary">📥 Commandes envoyées depuis les tablettes clients</div>
+    <div id="queueEnAttente"></div><hr><div id="queueEnPrepa"></div><hr>
+    <div class="card"><h3>📜 Dernières servies</h3><div id="queueServi"></div></div>`;
+    function refresh() {
+        const enAttente = commandes.filter(c=>zones.includes(c.emplacement) && c.statut==="en_attente");
+        const enPrepa = commandes.filter(c=>zones.includes(c.emplacement) && c.statut==="en_preparation");
+        const servi = ventesBar.filter(v=>zones.includes(v.emplacement)).slice(-8).reverse();
+
+        document.getElementById("queueEnAttente").innerHTML = `<h3>🟠 En attente (${enAttente.length})</h3>` + (enAttente.map(c => `
+            <div class="card"><strong>Table ${c.numeroTable}</strong>${zoneTag(c.emplacement)} ${badgeStatut(c.statut)}<br>
+            ${c.items.map(i=>`${i.nom} x${i.qte}`).join(', ')}<br>
+            <strong>Total: ${formatMontant(c.total)}</strong><br>
+            <button data-send="${c.id}">📤 Envoyer en préparation</button></div>
+        `).join('') || "<em>Aucune commande en attente</em>");
+
+        document.getElementById("queueEnPrepa").innerHTML = `<h3>🔵 En préparation (${enPrepa.length})</h3>` + (enPrepa.map(c => `
+            <div class="card"><strong>Table ${c.numeroTable}</strong>${zoneTag(c.emplacement)} ${badgeStatut(c.statut)}<br>
+            ${c.items.map(i=>`${i.nom} x${i.qte}`).join(', ')}<br>
+            <strong>Total: ${formatMontant(c.total)}</strong><br>
+            <button class="print-receipt" data-serve="${c.id}">✅ Marquer servi</button></div>
+        `).join('') || "<em>Rien en préparation</em>");
+
+        document.getElementById("queueServi").innerHTML = servi.map(v => `${v.date} - Table ${v.numeroTable}${zoneTag(v.emplacement)} - ${formatMontant(parseFloat(v.total))}`).join("<hr>") || "<em>Aucune vente</em>";
+
+        container.querySelectorAll("[data-send]").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const id = parseInt(btn.dataset.send);
+                const c = commandes.find(x=>x.id===id);
+                if(c) { c.statut = "en_preparation"; saveAllData(); refresh(); }
+            });
+        });
+        container.querySelectorAll("[data-serve]").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const id = parseInt(btn.dataset.serve);
+                const c = commandes.find(x=>x.id===id);
+                if(c) {
+                    c.statut = "servi";
+                    ventesBar.push({ id: Date.now(), date: new Date().toLocaleString(), numeroTable: c.numeroTable, emplacement: c.emplacement, items: c.items, total: c.total.toFixed(2) });
+                    commandes = commandes.filter(x=>x.id!==id);
+                    saveAllData(); refresh();
+                }
+            });
+        });
+    }
+    refresh();
+}
+
+// ================================================================
+// 8bis. SÉANCES PISCINE (paiement par personne — seul / couple / groupe)
+// ================================================================
+function calculerSeancePiscine(type, nbPersonnes) {
+    const prixUnitaire = prixSeancePiscine;
+    let gratuits = 0;
+    if (type === "groupe" && nbPersonnes >= seuilGratuitGroupe) {
+        gratuits = Math.floor(nbPersonnes / seuilGratuitGroupe);
+    }
+    const payants = Math.max(0, nbPersonnes - gratuits);
+    const sousTotal = payants * prixUnitaire;
+    return { prixUnitaire, gratuits, payants, sousTotal };
+}
+
+function renderVentePiscineSession(tabId) {
+    tabId = tabId || "piscineSessions";
+    const container = document.getElementById(tabId);
+    if(!container) return;
+    container.innerHTML = `<div class="summary">🏊 Vente d'une séance piscine — facturée par personne (${formatMontantTexte(prixSeancePiscine)}/pers). Pour un groupe : 1 personne gratuite toutes les ${seuilGratuitGroupe} personnes.</div>
+    <div class="card-grid">
+        <div class="card"><h3>➕ Nouvelle séance</h3>
+            <select id="pscType">
+                <option value="seul">Personne seule (1)</option>
+                <option value="couple">Couple (2)</option>
+                <option value="groupe">Groupe</option>
+            </select>
+            <div id="pscNbGroupeWrap" style="display:none;">
+                <label style="font-size:0.85rem;color:#64748b;">Nombre de personnes du groupe</label>
+                <input id="pscNbGroupe" type="number" min="3" step="1" value="12">
+            </div>
+            <div id="pscRabaisWrap" style="display:none;">
+                <label style="display:flex;align-items:center;gap:0.5rem;">
+                    <input type="checkbox" id="pscAppliquerRabais" style="width:auto;">
+                    Appliquer le rabais groupe (${rabaisGroupePourcent}% — défini par l'admin)
+                </label>
+            </div>
+            <div id="pscDetailCalcul" class="summary" style="margin-top:0.8rem;"></div>
+            <input id="pscClientNom" placeholder="Nom du client / groupe (optionnel)">
+            <button id="pscEncaisser">Encaisser</button>
+        </div>
+        <div class="card"><h3>📜 Séances récentes</h3><div id="pscHistorique"></div></div>
+    </div>`;
+
+    function nbPersonnesActuel() {
+        const type = document.getElementById("pscType").value;
+        if (type === "seul") return 1;
+        if (type === "couple") return 2;
+        const n = parseInt(document.getElementById("pscNbGroupe").value);
+        return isNaN(n) || n < 1 ? 0 : n;
+    }
+    function refreshCalcul() {
+        const type = document.getElementById("pscType").value;
+        document.getElementById("pscNbGroupeWrap").style.display = type === "groupe" ? "block" : "none";
+        document.getElementById("pscRabaisWrap").style.display = (type === "groupe" && rabaisGroupePourcent > 0) ? "block" : "none";
+        const nb = nbPersonnesActuel();
+        const calc = calculerSeancePiscine(type, nb);
+        const appliquerRabais = type === "groupe" && document.getElementById("pscAppliquerRabais")?.checked;
+        const montantRabais = appliquerRabais ? calc.sousTotal * (rabaisGroupePourcent/100) : 0;
+        const total = calc.sousTotal - montantRabais;
+        let html = `Personnes: ${nb} — Payantes: ${calc.payants}`;
+        if (calc.gratuits > 0) html += ` — <strong style="color:#16a34a;">Gratuites: ${calc.gratuits} 🎁</strong>`;
+        html += `<br>Sous-total: ${formatMontant(calc.sousTotal)}`;
+        if (appliquerRabais) html += `<br>Rabais groupe (${rabaisGroupePourcent}%): -${formatMontant(montantRabais)}`;
+        html += `<br><strong>Total à payer: ${formatMontant(total)}</strong>`;
+        document.getElementById("pscDetailCalcul").innerHTML = html;
+    }
+    document.getElementById("pscType")?.addEventListener("change", refreshCalcul);
+    document.getElementById("pscNbGroupe")?.addEventListener("input", refreshCalcul);
+    document.getElementById("pscAppliquerRabais")?.addEventListener("change", refreshCalcul);
+
+    function refreshHistorique() {
+        const hist = document.getElementById("pscHistorique");
+        hist.innerHTML = ventesPiscineSessions.slice(-8).reverse().map(v => `
+            <div>${v.date} — ${v.type} (${v.nbPersonnes} pers., ${v.gratuits} gratuite${v.gratuits>1?'s':''}) ${v.clientNom?('- '+v.clientNom):''} — <strong>${formatMontant(v.total)}</strong></div>
+        `).join('') || "<em>Aucune séance enregistrée</em>";
+    }
+    document.getElementById("pscEncaisser")?.addEventListener("click", () => {
+        const type = document.getElementById("pscType").value;
+        const nb = nbPersonnesActuel();
+        if (nb < 1) { alert("Nombre de personnes invalide."); return; }
+        const calc = calculerSeancePiscine(type, nb);
+        const appliquerRabais = type === "groupe" && document.getElementById("pscAppliquerRabais")?.checked;
+        const montantRabais = appliquerRabais ? calc.sousTotal * (rabaisGroupePourcent/100) : 0;
+        const total = calc.sousTotal - montantRabais;
+        const clientNom = document.getElementById("pscClientNom").value.trim();
+        const vente = { id: Date.now(), date: new Date().toLocaleString(), type, nbPersonnes: nb, prixUnitaire: calc.prixUnitaire, gratuits: calc.gratuits, payants: calc.payants, sousTotal: calc.sousTotal, rabaisPourcent: appliquerRabais ? rabaisGroupePourcent : 0, montantRabais, total, clientNom };
+        ventesPiscineSessions.push(vente);
+        saveAllData();
+        document.getElementById("pscClientNom").value = "";
+        document.getElementById("pscType").value = "seul";
+        refreshCalcul();
+        refreshHistorique();
+        const lignes = [
+            `Type: ${type}`,
+            `Personnes: ${nb} (payantes: ${calc.payants}, gratuites: ${calc.gratuits})`
+        ];
+        if (appliquerRabais) lignes.push(`Rabais groupe: ${rabaisGroupePourcent}%`);
+        if (clientNom) lignes.push(`Client: ${clientNom}`);
+        printReceipt("Séance Piscine", lignes, total);
+    });
+
+    refreshCalcul();
+    refreshHistorique();
+}
+
+function renderBusinessDashboard(business, containerId) {
+    const container = document.getElementById(containerId || `${business}Dash`);
+    if(!container) return;
+    const emplacementLabels = { bar: "Bar", piscine: "Bar Piscine", vip: "VIP" };
+    if(business === "hotel") {
+        const nbOcc = chambres.filter(c=>c.statut==="occupee").length;
+        container.innerHTML = `<div class="summary">📊 Hôtel : ${nbOcc}/${chambres.length} chambres occupées</div>`;
+    } else if(Array.isArray(business)) {
+        // Ex: rôle Bar qui gère aussi le VIP -> business = ["bar","vip"]
+        const lignes = business.map(z => {
+            const ca = ventesBar.filter(v=>v.emplacement===z).reduce((s,v)=>s+parseFloat(v.total),0);
+            const enAttente = commandes.filter(c=>c.emplacement===z && c.statut!=="servi").length;
+            return `🍹 CA ${emplacementLabels[z]||z} : ${formatMontant(ca)} — ${enAttente} commande(s) en cours`;
+        });
+        container.innerHTML = `<div class="summary">${lignes.join("<br>")}</div>`;
+    } else if(business === "bar" || business === "piscine" || business === "vip") {
+        const ca = ventesBar.filter(v=>v.emplacement===business).reduce((s,v)=>s+parseFloat(v.total),0);
+        const enAttente = commandes.filter(c=>c.emplacement===business && c.statut!=="servi").length;
+        if (business === "piscine") {
+            const caSessions = ventesPiscineSessions.reduce((s,v)=>s+v.total,0);
+            container.innerHTML = `<div class="summary">🍹 CA Bar Piscine : ${formatMontant(ca)} — ${enAttente} commande(s) en cours<br>🏊 CA Séances Piscine : ${formatMontant(caSessions)}</div>`;
+        } else {
+            container.innerHTML = `<div class="summary">🍹 CA ${emplacementLabels[business]||business} : ${formatMontant(ca)} — ${enAttente} commande(s) en cours</div>`;
+        }
+    } else if(business === "barber") {
+        const ca = ventesBarber.reduce((s,v)=>s+v.montant,0);
+        container.innerHTML = `<div class="summary">💈 CA Barber : ${formatMontant(ca)}</div>`;
+    } else if(business === "market") {
+        const ca = ventesMarket.reduce((s,v)=>s+parseFloat(v.total),0);
+        container.innerHTML = `<div class="summary">🛒 CA Market : ${formatMontant(ca)}</div>`;
+    }
+}
+
+// ================================================================
+// 9. ESPACE CLIENT (TABLETTE POSÉE SUR LA TABLE)
+// ================================================================
+document.getElementById("goClientBtn")?.addEventListener("click", async () => {
+    const listDiv = document.getElementById("tableSelectorList");
+    listDiv.innerHTML = "<em>Chargement...</em>";
+    document.getElementById("loginScreen").style.display = "none";
+    document.getElementById("clientSelectScreen").style.display = "block";
+    try {
+        await loadAllData();
+    } catch(e) {
+        listDiv.innerHTML = "<em style='color:#dc2626;'>Impossible de contacter le serveur. Vérifiez la connexion.</em>";
+        return;
+    }
+    const ouverts = comptesTables.filter(c=>c.statut==="ouvert");
+    listDiv.innerHTML = ouverts.length ? ouverts.map(c => `<button data-compte="${c.id}">Table ${c.numeroTable}</button>`).join('') : "<em>Aucune table ouverte pour le moment. Voyez la réception.</em>";
+    listDiv.querySelectorAll("[data-compte]").forEach(btn => {
+        btn.addEventListener("click", () => {
+            currentClientCompteId = parseInt(btn.dataset.compte);
+            initialiserNotifications();
+            document.getElementById("clientSelectScreen").style.display = "none";
+            document.getElementById("clientAppScreen").style.display = "block";
+            renderClientOrderView();
+        });
+    });
+});
+document.getElementById("backToLoginBtn")?.addEventListener("click", () => {
+    document.getElementById("clientSelectScreen").style.display = "none";
+    document.getElementById("loginScreen").style.display = "block";
+});
+document.getElementById("clientLogoutBtn")?.addEventListener("click", () => {
+    currentClientCompteId = null;
+    document.getElementById("clientAppScreen").style.display = "none";
+    document.getElementById("loginScreen").style.display = "block";
+});
+
+let clientCart = [];
+function renderClientOrderView() {
+    const compte = comptesTables.find(c=>c.id===currentClientCompteId);
+    const content = document.getElementById("clientAppContent");
+    if(!compte || compte.statut !== "ouvert") {
+        content.innerHTML = `<div class="summary">Ce compte n'est plus actif. Merci de contacter la réception.</div>`;
+        return;
+    }
+    document.getElementById("clientHeaderTitle").textContent = `🍹 Table ${compte.numeroTable}`;
+    const zoneProduit = compte.emplacement === "vip" ? "vip" : "bar";
+    const produits = produitsBar.filter(p=>p.zone===zoneProduit && p.stock>0);
+    const mesCommandes = commandes.filter(c=>c.compteTableId===compte.id).slice().reverse();
+
+    content.innerHTML = `
+        <div class="solde-banner">Solde disponible<br><span class="montant">${compte.solde.toFixed(2)} $</span><br><span style="font-size:1rem;color:#cbd5e1;">≈ ${Math.round(compte.solde*tauxChange).toLocaleString('fr-FR')} HTG</span></div>
+        <div class="card-grid">
+            <div class="card"><h3>🍹 Menu</h3><div id="clientMenu"></div></div>
+            <div class="card"><h3>🧾 Mon panier</h3><div id="clientCartDiv"></div>
+                <button id="clientSendOrder" class="print-receipt" style="width:100%;">Envoyer la commande</button>
+            </div>
+        </div>
+        <div class="card" style="margin-top:1.5rem;"><h3>📋 Mes commandes</h3><div id="clientOrdersList"></div></div>
+        <div class="card" style="margin-top:1.5rem;">
+            <h3>💬 Message à l'équipe</h3>
+            <div id="clientMsgThread" class="msg-thread-body" style="max-height:260px;border:1px solid #eef2f7;border-radius:1rem;padding:0.8rem;margin-bottom:0.6rem;"></div>
+            <div class="msg-composer" style="padding:0;border:none;background:transparent;">
+                <input id="clientMsgInput" placeholder="Écrire au bar / à la réception...">
+                <button id="clientMsgSendBtn" type="button">Envoyer</button>
+            </div>
+        </div>
+    `;
+
+    document.getElementById("clientMenu").innerHTML = produits.map(p => `
+        <div class="qty-stepper"><span style="flex:1;">${p.nom} - ${formatMontant(p.prix)}</span>
+        <button data-minus="${p.id}">-</button><span id="qty_${p.id}">0</span><button data-plus="${p.id}">+</button></div>
+    `).join('') || "<em>Aucun produit disponible</em>";
+
+    function refreshCartUI() {
+        const cartDiv = document.getElementById("clientCartDiv");
+        const total = clientCart.reduce((s,i)=>s+i.prix*i.qte,0);
+        cartDiv.innerHTML = clientCart.length ? (clientCart.map(i=>`${i.nom} x${i.qte} = ${(i.prix*i.qte).toFixed(2)} $`).join("<br>") + `<br><strong>Total: ${formatMontant(total)}</strong>`) : "<em>Panier vide</em>";
+        const btn = document.getElementById("clientSendOrder");
+        btn.disabled = clientCart.length === 0 || total > compte.solde;
+        if(total > compte.solde && clientCart.length) btn.textContent = "Solde insuffisant";
+        else btn.textContent = "Envoyer la commande";
+    }
+    document.getElementById("clientMenu").querySelectorAll("[data-plus]").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const id = parseInt(btn.dataset.plus);
+            const p = produits.find(x=>x.id===id);
+            let item = clientCart.find(i=>i.produitId===id);
+            const dejaEnPanier = item ? item.qte : 0;
+            if(dejaEnPanier >= p.stock) return;
+            if(!item) { item = { produitId: id, nom: p.nom, prix: p.prix, qte: 0 }; clientCart.push(item); }
+            item.qte++;
+            document.getElementById(`qty_${id}`).textContent = item.qte;
+            refreshCartUI();
+        });
+    });
+    document.getElementById("clientMenu").querySelectorAll("[data-minus]").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const id = parseInt(btn.dataset.minus);
+            let item = clientCart.find(i=>i.produitId===id);
+            if(!item) return;
+            item.qte--;
+            document.getElementById(`qty_${id}`).textContent = Math.max(0,item.qte);
+            if(item.qte<=0) clientCart = clientCart.filter(i=>i.produitId!==id);
+            refreshCartUI();
+        });
+    });
+    document.getElementById("clientSendOrder")?.addEventListener("click", async () => {
+        try { await reloadFromStorage(); } catch(e) { alert("Connexion au serveur impossible, réessayez."); return; }
+        const compteFrais = comptesTables.find(c=>c.id===currentClientCompteId);
+        const total = clientCart.reduce((s,i)=>s+i.prix*i.qte,0);
+        if(!compteFrais || total <= 0 || total > compteFrais.solde) { alert("Solde insuffisant ou panier vide"); return; }
+        for(const item of clientCart) {
+            const p = produitsBar.find(x=>x.id===item.produitId);
+            if(!p || p.stock < item.qte) { alert("Stock insuffisant pour " + item.nom); return; }
+        }
+        for(const item of clientCart) {
+            const p = produitsBar.find(x=>x.id===item.produitId);
+            p.stock -= item.qte;
+        }
+        compteFrais.solde -= total;
+        commandes.push({ id: Date.now(), compteTableId: compteFrais.id, numeroTable: compteFrais.numeroTable, emplacement: compteFrais.emplacement, items: clientCart.map(i=>({...i})), total, statut: "en_attente", dateCommande: new Date().toLocaleString() });
+        clientCart = [];
+        saveAllData();
+        renderClientOrderView();
+    });
+
+    document.getElementById("clientOrdersList").innerHTML = mesCommandes.map(c => `
+        <div>${c.dateCommande} — ${c.items.map(i=>`${i.nom} x${i.qte}`).join(', ')} — ${formatMontant(c.total)} ${badgeStatut(c.statut)}</div>
+    `).join('') || "<em>Aucune commande pour l'instant</em>";
+
+    // --- Messagerie table <-> personnel ---
+    const filMsg = messages.filter(m => m.tableId === compte.id).slice().sort((a,b)=>a.id-b.id);
+    const threadDiv = document.getElementById("clientMsgThread");
+    threadDiv.innerHTML = filMsg.map(m => `
+        <div class="msg-bubble ${m.fromId==='table' ? 'mine':'theirs'}" style="max-width:90%;">
+            <div class="msg-meta">${m.fromId==='table' ? 'Vous' : m.fromNom} · ${m.date}</div>
+            <div>${(m.text||"").replace(/</g,"&lt;")}</div>
+        </div>
+    `).join('') || `<em style="color:#94a3b8;">Aucun message — écrivez ici si vous avez besoin de quelque chose</em>`;
+    threadDiv.scrollTop = threadDiv.scrollHeight;
+    // Le client consulte son écran : on marque les messages du personnel comme lus
+    let changement = false;
+    messages.forEach(m => { if (m.tableId === compte.id && m.fromId !== "table" && !m.luClient) { m.luClient = true; changement = true; } });
+    if (changement) saveAllData();
+
+    document.getElementById("clientMsgSendBtn")?.addEventListener("click", () => {
+        const input = document.getElementById("clientMsgInput");
+        const text = input.value.trim();
+        if (!text) return;
+        messages.push({ id: Date.now(), tableId: compte.id, fromId: "table", fromNom: `Table ${compte.numeroTable} — ${compte.clientNom}`, toId: "staff", text, date: new Date().toLocaleString(), luStaff: false, luClient: true });
+        saveAllData();
+        input.value = "";
+        renderClientOrderView();
+    });
+    document.getElementById("clientMsgInput")?.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") document.getElementById("clientMsgSendBtn").click();
+    });
+
+    refreshCartUI();
+}
+
+// ================================================================
+// 10. BARBER
+// ================================================================
+function renderBarberVente() {
+    const container = document.getElementById("barberVente");
+    if(!container) return;
+    container.innerHTML = `<div class="summary">💈 Enregistrer une prestation (client vient, paie immédiatement)</div>
+    <div class="card-grid"><div class="card"><h3>Nouvelle vente</h3><input id="clientNom" placeholder="Nom client"><select id="serviceBarberSelect"></select><select id="coiffeurSelect"></select><button id="enregistrerVenteBarber">Enregistrer et payer</button></div>
+    <div class="card"><h3>Ventes du jour</h3><div id="ventesBarberRecent"></div></div></div>`;
+    function refresh() {
+        const servSelect = document.getElementById("serviceBarberSelect");
+        if(servSelect) servSelect.innerHTML = servicesBarber.map(s=>`<option value="${s.id}">${s.nom} - ${s.prix.toFixed(2)} $</option>`).join('');
+        const coiffSelect = document.getElementById("coiffeurSelect");
+        if(coiffSelect) coiffSelect.innerHTML = coiffeurs.map(c=>`<option value="${c.id}">${c.nom} (chaise ${c.numChaise})</option>`).join('');
+        const recentDiv = document.getElementById("ventesBarberRecent");
+        if(recentDiv) recentDiv.innerHTML = ventesBarber.slice(-5).reverse().map(v=>`${v.date} : ${v.clientNom} - ${v.serviceNom} (${v.coiffeurNom}) ${formatMontant(v.montant)}`).join("<hr>");
+    }
+    document.getElementById("enregistrerVenteBarber")?.addEventListener("click", () => {
+        const client = document.getElementById("clientNom").value;
+        const serviceId = parseInt(document.getElementById("serviceBarberSelect").value);
+        const coiffeurId = parseInt(document.getElementById("coiffeurSelect").value);
+        if(!client) return alert("Nom client requis");
+        const service = servicesBarber.find(s=>s.id===serviceId);
+        const coiffeur = coiffeurs.find(c=>c.id===coiffeurId);
+        if(service && coiffeur) {
+            ventesBarber.push({ id: Date.now(), date: new Date().toLocaleString(), clientNom: client, serviceNom: service.nom, coiffeurNom: coiffeur.nom, montant: service.prix });
+            saveAllData(); refresh();
+            printReceipt("Barber Shop", [`Client: ${client}`, `Service: ${service.nom}`, `Coiffeur: ${coiffeur.nom}`], service.prix.toFixed(2));
+            document.getElementById("clientNom").value = "";
+        }
+    });
+    refresh();
+}
+function renderBarberHistorique() {
+    const container = document.getElementById("barberHistorique");
+    if(!container) return;
+    container.innerHTML = `<div class="summary">📜 Historique complet des ventes Barber</div><div id="fullBarberHistory"></div>`;
+    document.getElementById("fullBarberHistory").innerHTML = ventesBarber.map(v=>`${v.date} - ${v.clientNom} : ${v.serviceNom} (${v.coiffeurNom}) - ${formatMontant(v.montant)}`).join("<hr>");
+}
+
+// ================================================================
+// 11. MARKET AVEC SCANNER CAMÉRA (comme un vrai supermarché)
+// ================================================================
+let marketScanner = null;
+let marketCartRef = [];
+function stopMarketScanner() {
+    if(marketScanner) {
+        marketScanner.stop().then(()=>marketScanner.clear()).catch(()=>{});
+        marketScanner = null;
+    }
+}
+function renderMarketVente() {
+    const container = document.getElementById("marketVente");
+    if(!container) return;
+    container.innerHTML = `<div class="summary">🛒 Scannez les articles avec la caméra, comme en caisse</div>
+    <div class="card-grid">
+        <div class="card"><h3>📷 Scanner un article</h3>
+            <button id="startScan">Démarrer la caméra</button>
+            <button id="stopScan" class="danger-btn">Arrêter</button>
+            <div id="reader"></div>
+            <div id="scanFeedback"></div>
+        </div>
+        <div class="card"><h3>🔎 Recherche manuelle</h3>
+            <input id="searchProduct" placeholder="Nom ou code-barre">
+            <button id="searchBtn">Rechercher</button>
+            <select id="productList" size="5"></select>
+            <input id="marketQty" type="number" value="1">
+            <button id="addToCart">Ajouter au panier</button>
+        </div>
+        <div class="card"><h3>🧾 Panier</h3><div id="cartItems"></div><button id="payMarket">Payer</button><button id="printMarketTicket" class="print-receipt">Imprimer ticket</button></div>
+        <div class="card"><h3>Ventes récentes</h3><div id="marketRecentVentes"></div></div>
+    </div>`;
+    marketCartRef = [];
+
+    function refreshCart() {
+        const cartDiv = document.getElementById("cartItems");
+        if(cartDiv) cartDiv.innerHTML = marketCartRef.map(item=>`${item.nom} x${item.qte} = ${(item.prix*item.qte).toFixed(2)} $`).join("<br>") + (marketCartRef.length ? `<br><strong>Total: ${formatMontant(marketCartRef.reduce((s,i)=>s+(i.prix*i.qte),0))}</strong>` : "<em>Panier vide</em>");
+    }
+    function refreshProductList(filter="") {
+        const list = document.getElementById("productList");
+        if(!list) return;
+        let filtered = articlesMarket.filter(a => a.nom.toLowerCase().includes(filter.toLowerCase()) || a.codeBarre.includes(filter));
+        list.innerHTML = filtered.map(a => `<option value="${a.id}">${a.nom} - ${a.prix.toFixed(2)} $ (stock:${a.stock})</option>`).join('');
+    }
+    function addArticleToCart(article, qte) {
+        if(!article || article.stock < qte) { document.getElementById("scanFeedback").innerHTML = `<span style="color:red;">Stock insuffisant pour ${article?article.nom:'cet article'}</span>`; return; }
+        const exist = marketCartRef.find(c=>c.articleId===article.id);
+        if(exist) exist.qte += qte; else marketCartRef.push({ articleId: article.id, nom: article.nom, prix: article.prix, qte });
+        refreshCart();
+    }
+    document.getElementById("startScan")?.addEventListener("click", () => {
+        stopMarketScanner();
+        marketScanner = new Html5Qrcode("reader");
+        marketScanner.start(
+            { facingMode: "environment" },
+            { fps: 10, qrbox: 220 },
+            (decodedText) => {
+                const article = articlesMarket.find(a => a.codeBarre === decodedText.trim());
+                if(article) {
+                    addArticleToCart(article, 1);
+                    document.getElementById("scanFeedback").innerHTML = `<span style="color:green;">✔ ${article.nom} ajouté</span>`;
+                } else {
+                    document.getElementById("scanFeedback").innerHTML = `<span style="color:red;">Code inconnu: ${decodedText}</span>`;
+                }
+            },
+            () => {}
+        ).catch(err => {
+            document.getElementById("scanFeedback").innerHTML = `<span style="color:red;">Caméra indisponible: ${err}</span>`;
+        });
+    });
+    document.getElementById("stopScan")?.addEventListener("click", stopMarketScanner);
+    document.getElementById("searchBtn")?.addEventListener("click", () => refreshProductList(document.getElementById("searchProduct").value));
+    document.getElementById("addToCart")?.addEventListener("click", () => {
+        const artId = parseInt(document.getElementById("productList").value);
+        const qte = parseInt(document.getElementById("marketQty").value) || 1;
+        addArticleToCart(articlesMarket.find(a=>a.id===artId), qte);
+    });
+    document.getElementById("payMarket")?.addEventListener("click", () => {
+        if(marketCartRef.length===0) return;
+        let total = 0;
+        for(let item of marketCartRef) {
+            const article = articlesMarket.find(a=>a.id===item.articleId);
+            if(article && article.stock >= item.qte) {
+                article.stock -= item.qte;
+                total += item.prix * item.qte;
+                ventesMarket.unshift({ id: Date.now(), date: new Date().toLocaleString(), article: article.nom, qte: item.qte, total: (item.prix*item.qte).toFixed(2) });
+            }
+        }
+        saveAllData();
+        printReceipt("Ticket Market", marketCartRef.map(i=>`${i.nom} x${i.qte} = ${(i.prix*i.qte).toFixed(2)} $`), total);
+        marketCartRef = [];
+        refreshCart();
+        document.getElementById("marketRecentVentes").innerHTML = ventesMarket.slice(0,5).map(v=>`${v.date} : ${v.article} x${v.qte} = ${formatMontant(parseFloat(v.total))}`).join("<hr>");
+    });
+    document.getElementById("printMarketTicket")?.addEventListener("click", () => {
+        if(marketCartRef.length===0) return alert("Panier vide");
+        const lines = marketCartRef.map(i=>`${i.nom} x${i.qte} = ${(i.prix*i.qte).toFixed(2)} $`);
+        const total = marketCartRef.reduce((s,i)=>s+(i.prix*i.qte),0).toFixed(2);
+        printReceipt("Ticket Market", lines, total);
+    });
+    document.getElementById("marketRecentVentes").innerHTML = ventesMarket.slice(0,5).map(v=>`${v.date} : ${v.article} x${v.qte} = ${formatMontant(parseFloat(v.total))}`).join("<hr>");
+    refreshProductList("");
+    refreshCart();
+}
+
+// ================================================================
+// 12. LOGIN / LOGOUT
+// ================================================================
+const roleLabels = { admin: "Admin", hotel: "Réceptionniste", bar: "Bar & VIP", barber: "Barber", market: "Market" };
+async function entrerDansApp(emp, role) {
+    currentUser = emp;
+    currentRole = role;
+    document.getElementById("loginScreen").style.display = "none";
+    document.getElementById("roleSelectScreen").style.display = "none";
+    document.getElementById("loginError").innerText = "";
+    try {
+        await loadAllData();
+    } catch(e) {
+        document.getElementById("loginError").innerText = "Connexion au serveur impossible. Réessayez.";
+        document.getElementById("loginScreen").style.display = "block";
+        return;
+    }
+    initialiserNotifications();
+    document.getElementById("mainApp").style.display = "block";
+    document.getElementById("roleDisplay").innerText = `${emp.nom} (${(roleLabels[role]||role).toUpperCase()})`;
+    buildUI();
+}
+document.getElementById("loginBtn")?.addEventListener("click", async () => {
+    const username = document.getElementById("loginUsername").value;
+    const password = document.getElementById("loginPassword").value;
+    const errDiv = document.getElementById("loginError");
+    errDiv.innerText = "";
+    if (!username || !password) { errDiv.innerText = "Renseignez le login et le mot de passe."; return; }
+    let emp;
+    try {
+        const res = await fetch(`${API_BASE}/api/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password })
+        });
+        if (!res.ok) {
+            errDiv.innerText = res.status === 401 ? "Identifiants incorrects" : "Erreur de connexion au serveur.";
+            return;
+        }
+        emp = await res.json();
+    } catch(e) {
+        errDiv.innerText = "Impossible de contacter le serveur. Vérifiez la connexion.";
+        return;
+    }
+    const roles = emp.roles || [];
+    if (roles.length === 0) {
+        errDiv.innerText = "Ce compte n'a aucun rôle attribué. Contactez l'admin.";
+    } else if (roles.length === 1) {
+        await entrerDansApp(emp, roles[0]);
+    } else {
+        // Plusieurs rôles : on laisse l'employé choisir avec quel rôle se connecter
+        document.getElementById("loginScreen").style.display = "none";
+        document.getElementById("roleSelectScreen").style.display = "block";
+        document.getElementById("roleSelectSubtitle").textContent = `${emp.nom}, avec quel rôle voulez-vous vous connecter ?`;
+        const btnsDiv = document.getElementById("roleSelectButtons");
+        btnsDiv.innerHTML = "";
+        roles.forEach(r => {
+            const b = document.createElement("button");
+            b.textContent = roleLabels[r] || r;
+            b.addEventListener("click", () => entrerDansApp(emp, r));
+            btnsDiv.appendChild(b);
+        });
+    }
+});
+document.getElementById("backToLoginFromRole")?.addEventListener("click", () => {
+    document.getElementById("roleSelectScreen").style.display = "none";
+    document.getElementById("loginScreen").style.display = "block";
+});
+document.getElementById("logoutBtn")?.addEventListener("click", () => {
+    stopMarketScanner();
+    clearInterval(dispoRefreshInterval);
+    currentRole = "";
+    document.getElementById("mainApp").style.display = "none";
+    document.getElementById("loginScreen").style.display = "block";
+    document.getElementById("loginUsername").value = "";
+    document.getElementById("loginPassword").value = "";
+    document.getElementById("loginError").innerText = "";
+});
+
+// ================================================================
+// NOTIFICATIONS (toast + son) — nouvelles commandes / nouveaux messages
+// ================================================================
+let ordresVus = new Set();
+let messagesVus = new Set();
+function initialiserNotifications() {
+    ordresVus = new Set(commandes.map(c => c.id));
+    messagesVus = new Set(messages.map(m => m.id));
+}
+function jouerBip() {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.frequency.value = 880;
+        gain.gain.setValueAtTime(0.15, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+        osc.start(); osc.stop(ctx.currentTime + 0.4);
+    } catch(e) { /* audio indisponible, on ignore */ }
+}
+function showToast(text, type) {
+    const cont = document.getElementById("toastContainer");
+    if (!cont) return;
+    const el = document.createElement("div");
+    el.className = "toast" + (type ? " toast-" + type : "");
+    el.textContent = text;
+    cont.appendChild(el);
+    jouerBip();
+    setTimeout(() => { el.classList.add("toast-out"); setTimeout(() => el.remove(), 400); }, 5000);
+}
+function verifierNotifications() {
+    if (!currentRole && !currentClientCompteId) return;
+    if (currentUser && (currentRole === "bar" || currentRole === "hotel")) {
+        const zones = currentRole === "bar" ? ["bar","vip"] : ["piscine"];
+        const nouvelles = commandes.filter(c => zones.includes(c.emplacement) && !ordresVus.has(c.id));
+        nouvelles.forEach(c => {
+            ordresVus.add(c.id);
+            showToast(`🔔 Nouvelle commande — Table ${c.numeroTable} (${c.total.toFixed(2)} $)`, "commande");
+        });
+    }
+    if (currentUser) {
+        const nouveauxMsgs = messages.filter(m => !m.tableId && m.fromId !== currentUser.id && !messagesVus.has(m.id) && (m.toId === currentUser.id || m.toId === "all"));
+        nouveauxMsgs.forEach(m => {
+            messagesVus.add(m.id);
+            showToast(`💬 ${m.fromNom} : ${m.text}`, "message");
+        });
+        // Messages envoyés par un client depuis sa tablette vers l'équipe
+        if (currentRole === "bar" || currentRole === "hotel" || currentRole === "admin") {
+            const zonesVues = currentRole === "bar" ? ["bar","vip"] : currentRole === "hotel" ? ["piscine"] : null; // null = toutes zones (réception voit piscine, admin voit tout)
+            const nouveauxTableMsgs = messages.filter(m => {
+                if (!m.tableId || m.fromId !== "table" || messagesVus.has(m.id)) return false;
+                if (!zonesVues) return true;
+                const compte = comptesTables.find(c => c.id === m.tableId);
+                return compte && zonesVues.includes(compte.emplacement);
+            });
+            nouveauxTableMsgs.forEach(m => {
+                messagesVus.add(m.id);
+                showToast(`🍽️ ${m.fromNom} : ${m.text}`, "message");
+            });
+        }
+    }
+    // Messages envoyés par l'équipe vers CETTE table, côté tablette client
+    if (currentClientCompteId) {
+        const nouveauxPourClient = messages.filter(m => m.tableId === currentClientCompteId && m.fromId !== "table" && !messagesVus.has(m.id));
+        nouveauxPourClient.forEach(m => {
+            messagesVus.add(m.id);
+            showToast(`💬 ${m.fromNom} : ${m.text}`, "message");
+        });
+    }
+    if (currentUser) updateNavBadges();
+}
+
+// Ne synchronise/rafraîchit automatiquement QUE si l'utilisateur n'est pas en train
+// de taper dans un champ — sinon on efface ce qu'il est en train d'écrire.
+function estEnTrainDeSaisir() {
+    const el = document.activeElement;
+    if (!el) return false;
+    const tag = el.tagName;
+    return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT";
+}
+setInterval(async () => {
+    if (!currentRole && !currentClientCompteId) return;
+    try {
+        await reloadFromStorage();
+    } catch(e) { return; } // Serveur momentanément injoignable : on réessaiera au prochain cycle
+    verifierNotifications();
+    if (estEnTrainDeSaisir()) return;
+    if (currentClientCompteId) { renderClientOrderView(); }
+    else if (currentRole) { refreshCurrentTab(); }
+}, 4000);
+</script>
+</body>
+</html>

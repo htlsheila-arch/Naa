@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>La Casa Del Shei — Ma Table</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+    --gold: #d4af37; --gold2: #f4d675; --teal: #0d9488; --teal2: #14b8a6;
+    --ink: #1c1917; --cream: #fffaf0; --card-radius: 1.6rem;
+}
+* { box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
+body {
+    margin: 0; min-height: 100vh; padding: 20px; color: var(--ink);
+    background: radial-gradient(circle at top left, #134e4a 0%, #0f172a 55%, #1c1917 100%);
+    background-attachment: fixed;
+}
+h1, h2, h3, .brand { font-family: 'Fredoka', 'Inter', sans-serif; }
+
+/* --- Écran d'accueil / saisie code --- */
+.welcome-wrap { max-width: 460px; margin: 4rem auto; text-align: center; }
+.brand { color: var(--gold2); font-size: 1.5rem; font-weight: 700; letter-spacing: 0.04em; margin-bottom: 0.2rem; }
+.brand-sub { color: #cbd5e1; margin-bottom: 2rem; font-size: 0.95rem; }
+.code-card { background: var(--cream); border-radius: 2rem; padding: 2.2rem 1.8rem; box-shadow: 0 25px 60px -20px rgba(0,0,0,0.6); border: 1px solid rgba(212,175,55,0.4); }
+.code-card h2 { margin-top: 0; color: var(--ink); font-size: 1.3rem; }
+.code-card p { color: #57534e; font-size: 0.92rem; }
+#clientCodeInput { width: 100%; text-align: center; font-size: 2.1rem; letter-spacing: 0.5rem; font-weight: 700; padding: 0.8rem; border-radius: 1.2rem; border: 2px solid #e7e5e4; margin: 1rem 0 0.4rem; background: #fff; color: var(--ink); }
+#clientCodeInput:focus { outline: none; border-color: var(--teal); }
+#clientCodeError { color: #dc2626; font-weight: 600; min-height: 1.3rem; margin-bottom: 0.6rem; }
+.gold-btn { width: 100%; border: none; padding: 0.9rem; border-radius: 1.2rem; font-weight: 700; font-size: 1.05rem; cursor: pointer; color: #1c1917; background: linear-gradient(120deg, var(--gold2), var(--gold)); box-shadow: 0 10px 25px -8px rgba(212,175,55,0.6); transition: transform 0.15s; }
+.gold-btn:hover { transform: translateY(-1px); }
+.gold-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.help-text { color: #94a3b8; font-size: 0.82rem; margin-top: 1.6rem; }
+
+/* --- App client (menu / panier / commandes) --- */
+#clientAppScreen { display: none; max-width: 900px; margin: 0 auto; }
+.client-header { display: flex; justify-content: space-between; align-items: center; background: linear-gradient(120deg, #134e4a, #0f766e); color: white; padding: 1.1rem 1.4rem; border-radius: 1.6rem; margin-bottom: 1.2rem; box-shadow: 0 15px 30px -15px rgba(0,0,0,0.5); }
+.client-header h1 { margin: 0; font-size: 1.25rem; }
+.quit-btn { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 0.45rem 1rem; border-radius: 2rem; cursor: pointer; font-weight: 600; font-size: 0.85rem; }
+.quit-btn:hover { background: rgba(255,255,255,0.28); }
+.solde-banner { background: linear-gradient(120deg, #78350f, #b45309); color:white; border-radius:1.4rem; padding:1.3rem; text-align:center; margin-bottom:1.2rem; box-shadow: 0 10px 25px -10px rgba(0,0,0,0.4); }
+.solde-banner .montant { font-size:2.2rem; font-weight:800; color: var(--gold2); }
+.client-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 1.2rem; }
+@media (max-width: 760px) { .client-grid { grid-template-columns: 1fr; } }
+.client-card { background: var(--cream); border-radius: var(--card-radius); padding: 1.3rem; box-shadow: 0 12px 28px -12px rgba(0,0,0,0.35); margin-bottom: 1.2rem; }
+.client-card h3 { margin-top: 0; color: var(--ink); border-left: 5px solid var(--teal); padding-left: 0.7rem; }
+#clientMenuTabs button { border: none; padding: 0.5rem 0.9rem; border-radius: 1.3rem; font-weight: 700; font-size: 0.85rem; cursor: pointer; background: #e7e5e4; color: #57534e; margin: 0 0.25rem 0.4rem 0; }
+#clientMenuTabs button.active-tab { background: linear-gradient(120deg, var(--teal), var(--teal2)); color: white; }
+.qty-stepper { display:flex; align-items:center; gap:0.6rem; margin:0.4rem 0; padding: 0.4rem 0; border-bottom: 1px dashed #e7e5e4; }
+.qty-stepper button { border: none; background: var(--teal); color: white; width: 2rem; height: 2rem; border-radius: 50%; font-weight: 800; cursor: pointer; }
+.qty-stepper span { min-width:1.6rem; text-align:center; font-weight:700; }
+#clientSendOrder { margin-top: 0.8rem; }
+.msg-thread-body { flex: 1; overflow-y: auto; }
+.msg-bubble { max-width: 85%; padding: 0.55rem 0.85rem; border-radius: 1rem; font-size: 0.88rem; margin-bottom: 0.4rem; }
+.msg-bubble.mine { margin-left: auto; background: linear-gradient(120deg, var(--teal), var(--teal2)); color: white; border-bottom-right-radius: 0.3rem; }
+.msg-bubble.theirs { background: #e7e5e4; color: #1c1917; border-bottom-left-radius: 0.3rem; }
+.msg-meta { font-size: 0.7rem; opacity: 0.7; margin-bottom: 0.1rem; }
+.msg-composer { display: flex; gap: 0.5rem; margin-top: 0.6rem; }
+.msg-composer input { flex: 1; padding: 0.6rem 0.8rem; border-radius: 1rem; border: 1.5px solid #e7e5e4; }
+.msg-composer button { border: none; background: var(--teal); color: white; padding: 0 1.1rem; border-radius: 1rem; font-weight: 700; cursor: pointer; }
+.badge { display:inline-block; padding: 0.2rem 0.7rem; border-radius: 1rem; font-size: 0.72rem; font-weight: 700; color:white; }
+.badge-attente { background: linear-gradient(120deg,#f59e0b,#fb923c); }
+.badge-prepa { background: linear-gradient(120deg,#3b82f6,#60a5fa); }
+.badge-servi { background: linear-gradient(120deg,#16a34a,#22c55e); }
+#toastContainer { position: fixed; top: 1rem; right: 1rem; z-index: 9999; display: flex; flex-direction: column; gap: 0.6rem; max-width: 320px; }
+.toast { background: #0f172a; color: white; padding: 0.9rem 1.1rem; border-radius: 1rem; box-shadow: 0 12px 30px -10px rgba(0,0,0,0.5); font-size: 0.9rem; border-left: 4px solid var(--gold); animation: toastIn 0.3s ease; }
+.toast-out { animation: toastOut 0.4s ease forwards; }
+@keyframes toastIn { from { opacity:0; transform: translateX(30px); } to { opacity:1; transform: translateX(0); } }
+@keyframes toastOut { to { opacity:0; transform: translateX(30px); } }
+</style>
+</head>
+<body>
+<div id="toastContainer"></div>
+
+<div id="welcomeScreen">
+    <div class="welcome-wrap">
+        <div class="brand">🏨 LA CASA DEL SHEI</div>
+        <div class="brand-sub">Espace client — table & compte</div>
+        <div class="code-card">
+            <h2>📱 Accès à mon compte</h2>
+            <p>Entrez le code à 4 chiffres remis par la réception ou le bar lors de votre dépôt.</p>
+            <input type="text" id="clientCodeInput" inputmode="numeric" maxlength="4" placeholder="••••">
+            <div id="clientCodeError"></div>
+            <button id="clientCodeSubmit" type="button" class="gold-btn">Accéder à mon compte</button>
+        </div>
+        <div class="help-text">Besoin d'aide ? Adressez-vous à un membre du personnel.</div>
+    </div>
+</div>
+
+<div id="clientAppScreen">
+    <div class="client-header">
+        <h1 id="clientHeaderTitle">🍹 Ma commande</h1>
+        <button id="clientLogoutBtn" class="quit-btn">Quitter</button>
+    </div>
+    <div id="clientAppContent"></div>
+</div>
+
+<script>
+const API_BASE = "http://localhost:3000";
+
+// ================================================================
+// DONNÉES (état complet — nécessaire pour ne rien écraser lors des sauvegardes)
+// ================================================================
+let servicesBarber = [], coiffeurs = [], ventesBarber = [];
+let produitsBar = [], ventesBar = [];
+let articlesMarket = [], ventesMarket = [];
+let chambres = [], reservationsHotel = [], servicesHotel = [], reservationServices = [];
+let comptesTables = [], messages = [], commandes = [];
+let ventesPiscineSessions = [], prixSeancePiscine = 5, seuilGratuitGroupe = 12, rabaisGroupePourcent = 0;
+let tauxChange = 130;
+
+let currentClientCompteId = null;
+let clientCart = [];
+const CATEGORIES_MENU = [
+    { key: "jus", label: "🧃 Jus" },
+    { key: "nourriture", label: "🍽️ Nourritures" },
+    { key: "shot", label: "🥃 Shot" },
+    { key: "rhum", label: "🍾 Rhum" },
+    { key: "gazeuse", label: "🥤 Gazeuses" }
+];
+let clientMenuCategorie = "jus";
+
+function formatMontant(usd) {
+    const g = Math.round(usd * tauxChange);
+    return `${usd.toFixed(2)} $ <span style="color:#78716c;font-size:0.85em;">(${g.toLocaleString('fr-FR')} HTG)</span>`;
+}
+function badgeStatut(s) {
+    if (s === "en_attente") return `<span class="badge badge-attente">En attente</span>`;
+    if (s === "en_preparation") return `<span class="badge badge-prepa">En préparation</span>`;
+    if (s === "servi") return `<span class="badge badge-servi">Servi</span>`;
+    return s;
+}
+
+// ================================================================
+// CHARGEMENT / SAUVEGARDE (même backend que l'application personnel)
+// ================================================================
+function loadAllData() {
+    return fetch(`${API_BASE}/api/state`)
+        .then(res => { if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
+        .then(d => {
+            servicesBarber = d.servicesBarber || [];
+            coiffeurs = d.coiffeurs || [];
+            ventesBarber = d.ventesBarber || [];
+            produitsBar = d.produitsBar || [];
+            ventesBar = d.ventesBar || [];
+            articlesMarket = d.articlesMarket || [];
+            ventesMarket = d.ventesMarket || [];
+            chambres = d.chambres || [];
+            reservationsHotel = d.reservationsHotel || [];
+            servicesHotel = d.servicesHotel || [];
+            reservationServices = d.reservationServices || [];
+            comptesTables = d.comptesTables || [];
+            commandes = d.commandes || [];
+            tauxChange = d.tauxChange || 130;
+            ventesPiscineSessions = d.ventesPiscineSessions || [];
+            prixSeancePiscine = (typeof d.prixSeancePiscine === "number") ? d.prixSeancePiscine : 5;
+            seuilGratuitGroupe = d.seuilGratuitGroupe || 12;
+            rabaisGroupePourcent = (typeof d.rabaisGroupePourcent === "number") ? d.rabaisGroupePourcent : 0;
+            messages = d.messages || [];
+        })
+        .catch(e => { console.error("Erreur de connexion au serveur:", e); throw e; });
+}
+function saveAllData() {
+    const toStore = {
+        servicesBarber, coiffeurs, ventesBarber,
+        produitsBar, ventesBar,
+        articlesMarket, ventesMarket,
+        chambres, reservationsHotel, servicesHotel, reservationServices,
+        comptesTables, commandes, tauxChange,
+        ventesPiscineSessions, prixSeancePiscine, seuilGratuitGroupe, rabaisGroupePourcent,
+        messages
+    };
+    fetch(`${API_BASE}/api/state`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(toStore)
+    }).catch(e => console.error("Erreur de sauvegarde vers le serveur:", e));
+}
+function reloadFromStorage() { return loadAllData(); }
+
+// ================================================================
+// NOTIFICATIONS (toast + son)
+// ================================================================
+let messagesVus = new Set();
+function initialiserNotifications() { messagesVus = new Set(messages.map(m => m.id)); }
+function jouerBip() {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.frequency.value = 880;
+        gain.gain.setValueAtTime(0.15, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+        osc.start(); osc.stop(ctx.currentTime + 0.4);
+    } catch(e) { /* audio indisponible, on ignore */ }
+}
+function showToast(text) {
+    const cont = document.getElementById("toastContainer");
+    if (!cont) return;
+    const el = document.createElement("div");
+    el.className = "toast";
+    el.textContent = text;
+    cont.appendChild(el);
+    jouerBip();
+    setTimeout(() => { el.classList.add("toast-out"); setTimeout(() => el.remove(), 400); }, 5000);
+}
+function verifierNotifications() {
+    if (!currentClientCompteId) return;
+    const nouveauxPourClient = messages.filter(m => m.tableId === currentClientCompteId && m.fromId !== "table" && !messagesVus.has(m.id));
+    nouveauxPourClient.forEach(m => {
+        messagesVus.add(m.id);
+        showToast(`💬 ${m.fromNom} : ${m.text}`);
+    });
+}
+function estEnTrainDeSaisir() {
+    const el = document.activeElement;
+    if (!el) return false;
+    const tag = el.tagName;
+    return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT";
+}
+
+// ================================================================
+// ACCÈS PAR CODE
+// ================================================================
+async function tenterAccesParCode() {
+    const errDiv = document.getElementById("clientCodeError");
+    const input = document.getElementById("clientCodeInput");
+    const code = input.value.trim();
+    errDiv.textContent = "";
+    if (!code) { errDiv.textContent = "⚠️ Entrez votre code d'accès."; return; }
+    errDiv.textContent = "Vérification...";
+    try {
+        await loadAllData();
+    } catch(e) {
+        errDiv.textContent = "Impossible de contacter le serveur. Vérifiez la connexion.";
+        return;
+    }
+    const compte = comptesTables.find(c => c.statut === "ouvert" && c.codeAcces === code);
+    if (!compte) { errDiv.textContent = "⚠️ Code invalide ou compte fermé. Voyez la réception."; return; }
+    errDiv.textContent = "";
+    currentClientCompteId = compte.id;
+    initialiserNotifications();
+    document.getElementById("welcomeScreen").style.display = "none";
+    document.getElementById("clientAppScreen").style.display = "block";
+    renderClientOrderView();
+}
+document.getElementById("clientCodeSubmit")?.addEventListener("click", tenterAccesParCode);
+document.getElementById("clientCodeInput")?.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") tenterAccesParCode();
+});
+document.getElementById("clientLogoutBtn")?.addEventListener("click", () => {
+    currentClientCompteId = null;
+    clientCart = [];
+    document.getElementById("clientAppScreen").style.display = "none";
+    document.getElementById("welcomeScreen").style.display = "block";
+    document.getElementById("clientCodeInput").value = "";
+    document.getElementById("clientCodeError").textContent = "";
+});
+
+// ================================================================
+// ESPACE COMMANDE CLIENT
+// ================================================================
+function renderClientOrderView() {
+    const compte = comptesTables.find(c=>c.id===currentClientCompteId);
+    const content = document.getElementById("clientAppContent");
+    if(!compte || compte.statut !== "ouvert") {
+        content.innerHTML = `<div class="client-card">Ce compte n'est plus actif. Merci de contacter la réception.</div>`;
+        return;
+    }
+    document.getElementById("clientHeaderTitle").textContent = `🍹 Table ${compte.numeroTable}`;
+    const zoneProduit = compte.emplacement === "vip" ? "vip" : "bar";
+    const produitsZone = produitsBar.filter(p=>p.zone===zoneProduit && p.stock>0);
+    const mesCommandes = commandes.filter(c=>c.compteTableId===compte.id).slice().reverse();
+
+    content.innerHTML = `
+        <div class="solde-banner">Solde disponible<br><span class="montant">${compte.solde.toFixed(2)} $</span><br><span style="font-size:1rem;color:#fde68a;">≈ ${Math.round(compte.solde*tauxChange).toLocaleString('fr-FR')} HTG</span></div>
+        <div class="client-grid">
+            <div>
+                <div class="client-card"><h3>🍹 Menu</h3>
+                    <div id="clientMenuTabs"></div>
+                    <div id="clientMenu"></div>
+                </div>
+            </div>
+            <div>
+                <div class="client-card"><h3>🧾 Mon panier</h3><div id="clientCartDiv"></div>
+                    <button id="clientSendOrder" class="gold-btn">Envoyer la commande</button>
+                </div>
+                <div class="client-card"><h3>📋 Mes commandes</h3><div id="clientOrdersList"></div></div>
+                <div class="client-card">
+                    <h3>💬 Message à l'équipe</h3>
+                    <div id="clientMsgThread" class="msg-thread-body" style="max-height:220px;"></div>
+                    <div class="msg-composer">
+                        <input id="clientMsgInput" placeholder="Écrire au bar / à la réception...">
+                        <button id="clientMsgSendBtn" type="button">Envoyer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    if (!CATEGORIES_MENU.find(c=>c.key===clientMenuCategorie)) clientMenuCategorie = "jus";
+    document.getElementById("clientMenuTabs").innerHTML = CATEGORIES_MENU.map(c => `
+        <button type="button" data-cat="${c.key}" class="${clientMenuCategorie===c.key ? 'active-tab' : ''}">${c.label}</button>
+    `).join('');
+    function renderMenuListe() {
+        const produits = produitsZone.filter(p => (p.categorie || "nourriture") === clientMenuCategorie);
+        document.getElementById("clientMenu").innerHTML = produits.map(p => `
+            <div class="qty-stepper"><span style="flex:1;">${p.nom} - ${formatMontant(p.prix)}</span>
+            <button data-minus="${p.id}">-</button><span id="qty_${p.id}">${(clientCart.find(i=>i.produitId===p.id)||{}).qte||0}</span><button data-plus="${p.id}">+</button></div>
+        `).join('') || "<em>Aucun produit dans cette catégorie</em>";
+        attacherBoutonsMenu(produits);
+    }
+    document.getElementById("clientMenuTabs").querySelectorAll("[data-cat]").forEach(btn => {
+        btn.addEventListener("click", () => {
+            clientMenuCategorie = btn.dataset.cat;
+            renderClientOrderView();
+        });
+    });
+
+    function refreshCartUI() {
+        const cartDiv = document.getElementById("clientCartDiv");
+        const total = clientCart.reduce((s,i)=>s+i.prix*i.qte,0);
+        cartDiv.innerHTML = clientCart.length ? (clientCart.map(i=>`${i.nom} x${i.qte} = ${(i.prix*i.qte).toFixed(2)} $`).join("<br>") + `<br><strong>Total: ${formatMontant(total)}</strong>`) : "<em>Panier vide</em>";
+        const btn = document.getElementById("clientSendOrder");
+        btn.disabled = clientCart.length === 0 || total > compte.solde;
+        if(total > compte.solde && clientCart.length) btn.textContent = "Solde insuffisant";
+        else btn.textContent = "Envoyer la commande";
+    }
+    function attacherBoutonsMenu(produits) {
+        document.getElementById("clientMenu").querySelectorAll("[data-plus]").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const id = parseInt(btn.dataset.plus);
+                const p = produits.find(x=>x.id===id);
+                let item = clientCart.find(i=>i.produitId===id);
+                const dejaEnPanier = item ? item.qte : 0;
+                if(dejaEnPanier >= p.stock) return;
+                if(!item) { item = { produitId: id, nom: p.nom, prix: p.prix, qte: 0 }; clientCart.push(item); }
+                item.qte++;
+                document.getElementById(`qty_${id}`).textContent = item.qte;
+                refreshCartUI();
+            });
+        });
+        document.getElementById("clientMenu").querySelectorAll("[data-minus]").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const id = parseInt(btn.dataset.minus);
+                let item = clientCart.find(i=>i.produitId===id);
+                if(!item) return;
+                item.qte--;
+                document.getElementById(`qty_${id}`).textContent = Math.max(0,item.qte);
+                if(item.qte<=0) clientCart = clientCart.filter(i=>i.produitId!==id);
+                refreshCartUI();
+            });
+        });
+    }
+    renderMenuListe();
+    document.getElementById("clientSendOrder")?.addEventListener("click", async () => {
+        try { await reloadFromStorage(); } catch(e) { alert("Connexion au serveur impossible, réessayez."); return; }
+        const compteFrais = comptesTables.find(c=>c.id===currentClientCompteId);
+        const total = clientCart.reduce((s,i)=>s+i.prix*i.qte,0);
+        if(!compteFrais || total <= 0 || total > compteFrais.solde) { alert("Solde insuffisant ou panier vide"); return; }
+        for(const item of clientCart) {
+            const p = produitsBar.find(x=>x.id===item.produitId);
+            if(!p || p.stock < item.qte) { alert("Stock insuffisant pour " + item.nom); return; }
+        }
+        for(const item of clientCart) {
+            const p = produitsBar.find(x=>x.id===item.produitId);
+            p.stock -= item.qte;
+        }
+        compteFrais.solde -= total;
+        commandes.push({ id: Date.now(), compteTableId: compteFrais.id, numeroTable: compteFrais.numeroTable, emplacement: compteFrais.emplacement, items: clientCart.map(i=>({...i})), total, statut: "en_attente", dateCommande: new Date().toLocaleString() });
+        clientCart = [];
+        saveAllData();
+        renderClientOrderView();
+    });
+
+    document.getElementById("clientOrdersList").innerHTML = mesCommandes.map(c => `
+        <div>${c.dateCommande} — ${c.items.map(i=>`${i.nom} x${i.qte}`).join(', ')} — ${formatMontant(c.total)} ${badgeStatut(c.statut)}</div>
+    `).join('') || "<em>Aucune commande pour l'instant</em>";
+
+    // --- Messagerie table <-> personnel ---
+    const filMsg = messages.filter(m => m.tableId === compte.id).slice().sort((a,b)=>a.id-b.id);
+    const threadDiv = document.getElementById("clientMsgThread");
+    threadDiv.innerHTML = filMsg.map(m => `
+        <div class="msg-bubble ${m.fromId==='table' ? 'mine':'theirs'}">
+            <div class="msg-meta">${m.fromId==='table' ? 'Vous' : m.fromNom} · ${m.date}</div>
+            <div>${(m.text||"").replace(/</g,"&lt;")}</div>
+        </div>
+    `).join('') || `<em style="color:#94a3b8;">Aucun message — écrivez ici si vous avez besoin de quelque chose</em>`;
+    threadDiv.scrollTop = threadDiv.scrollHeight;
+    let changement = false;
+    messages.forEach(m => { if (m.tableId === compte.id && m.fromId !== "table" && !m.luClient) { m.luClient = true; changement = true; } });
+    if (changement) saveAllData();
+
+    document.getElementById("clientMsgSendBtn")?.addEventListener("click", () => {
+        const input = document.getElementById("clientMsgInput");
+        const text = input.value.trim();
+        if (!text) return;
+        messages.push({ id: Date.now(), tableId: compte.id, fromId: "table", fromNom: `Table ${compte.numeroTable} — ${compte.clientNom}`, toId: "staff", text, date: new Date().toLocaleString(), luStaff: false, luClient: true });
+        saveAllData();
+        input.value = "";
+        renderClientOrderView();
+    });
+    document.getElementById("clientMsgInput")?.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") document.getElementById("clientMsgSendBtn").click();
+    });
+
+    refreshCartUI();
+}
+
+// ================================================================
+// SYNCHRONISATION AUTOMATIQUE
+// ================================================================
+setInterval(async () => {
+    if (!currentClientCompteId) return;
+    try { await reloadFromStorage(); } catch(e) { return; }
+    verifierNotifications();
+    if (estEnTrainDeSaisir()) return;
+    renderClientOrderView();
+}, 4000);
+</script>
+</body>
+</html>

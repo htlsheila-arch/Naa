@@ -123,8 +123,6 @@ hr { margin: 1rem 0; border: none; border-top: 1px solid #e2e8f0; }
     <input type="password" id="loginPassword" placeholder="Mot de passe">
     <button id="loginBtn" style="width:100%; margin-top:1rem;">Se connecter</button>
     <div id="loginError" style="color:red; text-align:center; margin-top:1rem;"></div>
-    <hr>
-    <button id="goClientBtn" class="print-receipt" style="width:100%;">📱 Tablette Client (Table)</button>
 </div>
 
 <div id="roleSelectScreen" style="display:none; max-width:450px; margin: 5rem auto; background:white; border-radius:2rem; padding:2rem; box-shadow:0 10px 25px rgba(0,0,0,0.1);">
@@ -132,25 +130,6 @@ hr { margin: 1rem 0; border: none; border-top: 1px solid #e2e8f0; }
     <p style="text-align:center; color:#64748b;" id="roleSelectSubtitle"></p>
     <div id="roleSelectButtons" style="display:flex; flex-direction:column; gap:0.6rem;"></div>
     <button id="backToLoginFromRole" style="width:100%; margin-top:1.2rem; background:#64748b;">⬅ Retour</button>
-</div>
-
-<div id="clientSelectScreen" style="display:none; max-width:500px; margin: 3rem auto; background:white; border-radius:2rem; padding:2rem; box-shadow:0 10px 25px rgba(0,0,0,0.1);">
-    <h2 style="text-align:center">📱 Sélection de la table</h2>
-    <p style="text-align:center; color:#64748b;">Choisissez le numéro de table affecté à cette tablette</p>
-    <div id="tableSelectorList" class="tableSelectorGrid"></div>
-    <button id="backToLoginBtn" style="width:100%; margin-top:1rem; background:#64748b;">⬅ Retour</button>
-</div>
-
-<div id="clientAppScreen" style="display:none;">
-    <div class="app-container">
-        <header>
-            <h1 id="clientHeaderTitle">🍹 Ma commande</h1>
-            <div class="user-info">
-                <button id="clientLogoutBtn" class="logout-btn">Quitter</button>
-            </div>
-        </header>
-        <div id="clientAppContent" style="padding:2rem;"></div>
-    </div>
 </div>
 
 <div id="mainApp" style="display:none;">
@@ -201,7 +180,15 @@ let ventesPiscineSessions = []; // { id, date, type:"seul"|"couple"|"groupe", nb
 
 let currentUser = null;
 let currentRole = "";
-let currentClientCompteId = null;
+const CATEGORIES_MENU = [
+    { key: "jus", label: "🧃 Jus" },
+    { key: "nourriture", label: "🍽️ Nourritures" },
+    { key: "shot", label: "🥃 Shot" },
+    { key: "rhum", label: "🍾 Rhum" },
+    { key: "gazeuse", label: "🥤 Gazeuses" }
+];
+function labelCategorie(key) { return (CATEGORIES_MENU.find(c=>c.key===key)||{}).label || "🍽️ Nourritures"; }
+let clientMenuCategorie = "jus";
 let dispoRefreshInterval = null;
 let tauxChange = 130; // Gourdes (HTG) pour 1 Dollar ($). Modifiable par l'admin.
 let prixSeancePiscine = 5;      // Prix d'une séance piscine, PAR PERSONNE ($). Modifiable par l'admin.
@@ -851,10 +838,10 @@ function renderManageBarProducts(tabId) {
     tabId = tabId || "manageBarProducts";
     const container = document.getElementById(tabId);
     if(!container) return;
-    container.innerHTML = `<div class="summary">🍻 Produits — le stock "Bar" est partagé entre le Bar classique et le Bar Piscine</div><div class="card-grid"><div class="card"><h3>➕ Ajouter produit</h3><input id="prodNom" placeholder="Nom"><input id="prodPrix" type="number" placeholder="Prix"><input id="prodStock" type="number" placeholder="Stock"><select id="prodZone"><option value="bar">Bar & Piscine (stock partagé)</option><option value="vip">VIP</option></select><button id="addProduct">Ajouter</button></div><div class="card"><h3>📋 Produits</h3><div id="listProducts"></div></div></div>`;
+    container.innerHTML = `<div class="summary">🍻 Produits — le stock "Bar" est partagé entre le Bar classique et le Bar Piscine</div><div class="card-grid"><div class="card"><h3>➕ Ajouter produit</h3><input id="prodNom" placeholder="Nom"><input id="prodPrix" type="number" placeholder="Prix"><input id="prodStock" type="number" placeholder="Stock"><select id="prodZone"><option value="bar">Bar & Piscine (stock partagé)</option><option value="vip">VIP</option></select><select id="prodCategorie">${CATEGORIES_MENU.map(c=>`<option value="${c.key}">${c.label}</option>`).join('')}</select><button id="addProduct">Ajouter</button></div><div class="card"><h3>📋 Produits</h3><div id="listProducts"></div></div></div>`;
     function refresh() {
         const listDiv = document.getElementById("listProducts");
-        if(listDiv) listDiv.innerHTML = produitsBar.map(p => `<div>${p.nom} - ${formatMontant(p.prix)} - Stock:${p.stock} (${p.zone==="bar"?"Bar & Piscine":"VIP"}) <button class="danger-btn" data-id="${p.id}">Supprimer</button></div>`).join('');
+        if(listDiv) listDiv.innerHTML = produitsBar.map(p => `<div>${p.nom} - ${formatMontant(p.prix)} - Stock:${p.stock} (${p.zone==="bar"?"Bar & Piscine":"VIP"} · ${labelCategorie(p.categorie)}) <button class="danger-btn" data-id="${p.id}">Supprimer</button></div>`).join('');
         listDiv.querySelectorAll("[data-id]").forEach(btn => {
             btn.addEventListener("click", () => {
                 const id = parseInt(btn.dataset.id);
@@ -868,8 +855,9 @@ function renderManageBarProducts(tabId) {
         const prix = parseFloat(document.getElementById("prodPrix").value);
         const stock = parseInt(document.getElementById("prodStock").value);
         const zone = document.getElementById("prodZone").value;
+        const categorie = document.getElementById("prodCategorie").value;
         if(!nom || isNaN(prix) || isNaN(stock)) return;
-        produitsBar.push({ id: Date.now(), nom, prix, zone, stock });
+        produitsBar.push({ id: Date.now(), nom, prix, zone, stock, categorie });
         saveAllData(); refresh();
     });
     refresh();
@@ -1243,6 +1231,12 @@ function renderComptesTables(tabId, emplacementsAutorises) {
     <div class="card"><h3>📋 Comptes ouverts${zoneUnique ? " — " + emplacementLabels[zoneUnique] : ""}</h3><div id="ctList"></div></div>
     </div>`;
     function nextTable() { const d = tablesDisponibles(); return d.length ? d[0] : null; }
+    function genererCodeAcces() {
+        const codesUtilises = new Set(comptesTables.filter(c=>c.statut==="ouvert").map(c=>c.codeAcces));
+        let code;
+        do { code = String(Math.floor(1000 + Math.random()*9000)); } while (codesUtilises.has(code));
+        return code;
+    }
     function updateEquivalent() {
         const val = parseFloat(document.getElementById("ctMontant").value);
         const dev = document.getElementById("ctDevise").value;
@@ -1257,7 +1251,7 @@ function renderComptesTables(tabId, emplacementsAutorises) {
         document.getElementById("ctNextTable").textContent = nextTable() ? "Table n° " + nextTable() : "⚠️ Aucune table disponible";
         const listDiv = document.getElementById("ctList");
         const comptesAffiches = comptesTables.filter(c=>c.statut==="ouvert" && zonesFiltre.includes(c.emplacement));
-        if(listDiv) listDiv.innerHTML = comptesAffiches.slice().reverse().map(c => `<div><strong>Table ${c.numeroTable}</strong> - ${c.clientNom} (${emplacementLabels[c.emplacement]||c.emplacement}) - Solde: ${formatMontant(c.solde)} <button class="danger-btn" data-close="${c.id}">Clôturer</button></div>`).join('') || "<em>Aucun compte ouvert</em>";
+        if(listDiv) listDiv.innerHTML = comptesAffiches.slice().reverse().map(c => `<div><strong>Table ${c.numeroTable}</strong> - ${c.clientNom} (${emplacementLabels[c.emplacement]||c.emplacement}) - Solde: ${formatMontant(c.solde)} - Code: <code>${c.codeAcces||"—"}</code> <button class="danger-btn" data-close="${c.id}">Clôturer</button></div>`).join('') || "<em>Aucun compte ouvert</em>";
         listDiv.querySelectorAll("[data-close]").forEach(btn => {
             btn.addEventListener("click", () => {
                 const id = parseInt(btn.dataset.close);
@@ -1281,7 +1275,8 @@ function renderComptesTables(tabId, emplacementsAutorises) {
         if(isNaN(saisie) || saisie<=0) { errDiv.textContent = "⚠️ Montant du dépôt invalide."; return; }
         if(!num) { errDiv.textContent = "⚠️ Plus aucune table disponible."; return; }
         const montantUsd = devise === "htg" ? (saisie / tauxChange) : saisie;
-        const compte = { id: Date.now(), numeroTable: num, clientNom: client, emplacement, soldeInitial: montantUsd, solde: montantUsd, dateOuverture: new Date().toLocaleString(), statut: "ouvert" };
+        const codeAcces = genererCodeAcces();
+        const compte = { id: Date.now(), numeroTable: num, clientNom: client, emplacement, soldeInitial: montantUsd, solde: montantUsd, dateOuverture: new Date().toLocaleString(), statut: "ouvert", codeAcces };
         comptesTables.push(compte);
         saveAllData();
         // On vide le formulaire et on rafraîchit la liste AVANT l'impression : même si
@@ -1290,7 +1285,8 @@ function renderComptesTables(tabId, emplacementsAutorises) {
         document.getElementById("ctMontant").value = "";
         document.getElementById("ctEquivalent").textContent = "";
         refresh();
-        printReceipt("Ouverture compte table", [`Client: ${client}`, `Table attribuée: n°${num}`, `Zone: ${emplacementLabels[emplacement]}`, `Dépôt: ${formatMontantTexte(montantUsd)}`], montantUsd);
+        printReceipt("Ouverture compte table", [`Client: ${client}`, `Table attribuée: n°${num}`, `Zone: ${emplacementLabels[emplacement]}`, `Dépôt: ${formatMontantTexte(montantUsd)}`, `CODE D'ACCÈS TABLETTE: ${codeAcces}`], montantUsd);
+        alert(`Compte ouvert — Table ${num}\nCode d'accès à donner au client : ${codeAcces}`);
     });
     refresh();
 }
@@ -1492,163 +1488,13 @@ function renderBusinessDashboard(business, containerId) {
 // ================================================================
 // 9. ESPACE CLIENT (TABLETTE POSÉE SUR LA TABLE)
 // ================================================================
-document.getElementById("goClientBtn")?.addEventListener("click", async () => {
-    const listDiv = document.getElementById("tableSelectorList");
-    listDiv.innerHTML = "<em>Chargement...</em>";
-    document.getElementById("loginScreen").style.display = "none";
-    document.getElementById("clientSelectScreen").style.display = "block";
-    try {
-        await loadAllData();
-    } catch(e) {
-        listDiv.innerHTML = "<em style='color:#dc2626;'>Impossible de contacter le serveur. Vérifiez la connexion.</em>";
-        return;
-    }
-    const ouverts = comptesTables.filter(c=>c.statut==="ouvert");
-    listDiv.innerHTML = ouverts.length ? ouverts.map(c => `<button data-compte="${c.id}">Table ${c.numeroTable}</button>`).join('') : "<em>Aucune table ouverte pour le moment. Voyez la réception.</em>";
-    listDiv.querySelectorAll("[data-compte]").forEach(btn => {
-        btn.addEventListener("click", () => {
-            currentClientCompteId = parseInt(btn.dataset.compte);
-            initialiserNotifications();
-            document.getElementById("clientSelectScreen").style.display = "none";
-            document.getElementById("clientAppScreen").style.display = "block";
-            renderClientOrderView();
-        });
-    });
-});
-document.getElementById("backToLoginBtn")?.addEventListener("click", () => {
-    document.getElementById("clientSelectScreen").style.display = "none";
-    document.getElementById("loginScreen").style.display = "block";
-});
-document.getElementById("clientLogoutBtn")?.addEventListener("click", () => {
-    currentClientCompteId = null;
-    document.getElementById("clientAppScreen").style.display = "none";
-    document.getElementById("loginScreen").style.display = "block";
-});
-
-let clientCart = [];
-function renderClientOrderView() {
-    const compte = comptesTables.find(c=>c.id===currentClientCompteId);
-    const content = document.getElementById("clientAppContent");
-    if(!compte || compte.statut !== "ouvert") {
-        content.innerHTML = `<div class="summary">Ce compte n'est plus actif. Merci de contacter la réception.</div>`;
-        return;
-    }
-    document.getElementById("clientHeaderTitle").textContent = `🍹 Table ${compte.numeroTable}`;
-    const zoneProduit = compte.emplacement === "vip" ? "vip" : "bar";
-    const produits = produitsBar.filter(p=>p.zone===zoneProduit && p.stock>0);
-    const mesCommandes = commandes.filter(c=>c.compteTableId===compte.id).slice().reverse();
-
-    content.innerHTML = `
-        <div class="solde-banner">Solde disponible<br><span class="montant">${compte.solde.toFixed(2)} $</span><br><span style="font-size:1rem;color:#cbd5e1;">≈ ${Math.round(compte.solde*tauxChange).toLocaleString('fr-FR')} HTG</span></div>
-        <div class="card-grid">
-            <div class="card"><h3>🍹 Menu</h3><div id="clientMenu"></div></div>
-            <div class="card"><h3>🧾 Mon panier</h3><div id="clientCartDiv"></div>
-                <button id="clientSendOrder" class="print-receipt" style="width:100%;">Envoyer la commande</button>
-            </div>
-        </div>
-        <div class="card" style="margin-top:1.5rem;"><h3>📋 Mes commandes</h3><div id="clientOrdersList"></div></div>
-        <div class="card" style="margin-top:1.5rem;">
-            <h3>💬 Message à l'équipe</h3>
-            <div id="clientMsgThread" class="msg-thread-body" style="max-height:260px;border:1px solid #eef2f7;border-radius:1rem;padding:0.8rem;margin-bottom:0.6rem;"></div>
-            <div class="msg-composer" style="padding:0;border:none;background:transparent;">
-                <input id="clientMsgInput" placeholder="Écrire au bar / à la réception...">
-                <button id="clientMsgSendBtn" type="button">Envoyer</button>
-            </div>
-        </div>
-    `;
-
-    document.getElementById("clientMenu").innerHTML = produits.map(p => `
-        <div class="qty-stepper"><span style="flex:1;">${p.nom} - ${formatMontant(p.prix)}</span>
-        <button data-minus="${p.id}">-</button><span id="qty_${p.id}">0</span><button data-plus="${p.id}">+</button></div>
-    `).join('') || "<em>Aucun produit disponible</em>";
-
-    function refreshCartUI() {
-        const cartDiv = document.getElementById("clientCartDiv");
-        const total = clientCart.reduce((s,i)=>s+i.prix*i.qte,0);
-        cartDiv.innerHTML = clientCart.length ? (clientCart.map(i=>`${i.nom} x${i.qte} = ${(i.prix*i.qte).toFixed(2)} $`).join("<br>") + `<br><strong>Total: ${formatMontant(total)}</strong>`) : "<em>Panier vide</em>";
-        const btn = document.getElementById("clientSendOrder");
-        btn.disabled = clientCart.length === 0 || total > compte.solde;
-        if(total > compte.solde && clientCart.length) btn.textContent = "Solde insuffisant";
-        else btn.textContent = "Envoyer la commande";
-    }
-    document.getElementById("clientMenu").querySelectorAll("[data-plus]").forEach(btn => {
-        btn.addEventListener("click", () => {
-            const id = parseInt(btn.dataset.plus);
-            const p = produits.find(x=>x.id===id);
-            let item = clientCart.find(i=>i.produitId===id);
-            const dejaEnPanier = item ? item.qte : 0;
-            if(dejaEnPanier >= p.stock) return;
-            if(!item) { item = { produitId: id, nom: p.nom, prix: p.prix, qte: 0 }; clientCart.push(item); }
-            item.qte++;
-            document.getElementById(`qty_${id}`).textContent = item.qte;
-            refreshCartUI();
-        });
-    });
-    document.getElementById("clientMenu").querySelectorAll("[data-minus]").forEach(btn => {
-        btn.addEventListener("click", () => {
-            const id = parseInt(btn.dataset.minus);
-            let item = clientCart.find(i=>i.produitId===id);
-            if(!item) return;
-            item.qte--;
-            document.getElementById(`qty_${id}`).textContent = Math.max(0,item.qte);
-            if(item.qte<=0) clientCart = clientCart.filter(i=>i.produitId!==id);
-            refreshCartUI();
-        });
-    });
-    document.getElementById("clientSendOrder")?.addEventListener("click", async () => {
-        try { await reloadFromStorage(); } catch(e) { alert("Connexion au serveur impossible, réessayez."); return; }
-        const compteFrais = comptesTables.find(c=>c.id===currentClientCompteId);
-        const total = clientCart.reduce((s,i)=>s+i.prix*i.qte,0);
-        if(!compteFrais || total <= 0 || total > compteFrais.solde) { alert("Solde insuffisant ou panier vide"); return; }
-        for(const item of clientCart) {
-            const p = produitsBar.find(x=>x.id===item.produitId);
-            if(!p || p.stock < item.qte) { alert("Stock insuffisant pour " + item.nom); return; }
-        }
-        for(const item of clientCart) {
-            const p = produitsBar.find(x=>x.id===item.produitId);
-            p.stock -= item.qte;
-        }
-        compteFrais.solde -= total;
-        commandes.push({ id: Date.now(), compteTableId: compteFrais.id, numeroTable: compteFrais.numeroTable, emplacement: compteFrais.emplacement, items: clientCart.map(i=>({...i})), total, statut: "en_attente", dateCommande: new Date().toLocaleString() });
-        clientCart = [];
-        saveAllData();
-        renderClientOrderView();
-    });
-
-    document.getElementById("clientOrdersList").innerHTML = mesCommandes.map(c => `
-        <div>${c.dateCommande} — ${c.items.map(i=>`${i.nom} x${i.qte}`).join(', ')} — ${formatMontant(c.total)} ${badgeStatut(c.statut)}</div>
-    `).join('') || "<em>Aucune commande pour l'instant</em>";
-
-    // --- Messagerie table <-> personnel ---
-    const filMsg = messages.filter(m => m.tableId === compte.id).slice().sort((a,b)=>a.id-b.id);
-    const threadDiv = document.getElementById("clientMsgThread");
-    threadDiv.innerHTML = filMsg.map(m => `
-        <div class="msg-bubble ${m.fromId==='table' ? 'mine':'theirs'}" style="max-width:90%;">
-            <div class="msg-meta">${m.fromId==='table' ? 'Vous' : m.fromNom} · ${m.date}</div>
-            <div>${(m.text||"").replace(/</g,"&lt;")}</div>
-        </div>
-    `).join('') || `<em style="color:#94a3b8;">Aucun message — écrivez ici si vous avez besoin de quelque chose</em>`;
-    threadDiv.scrollTop = threadDiv.scrollHeight;
-    // Le client consulte son écran : on marque les messages du personnel comme lus
-    let changement = false;
-    messages.forEach(m => { if (m.tableId === compte.id && m.fromId !== "table" && !m.luClient) { m.luClient = true; changement = true; } });
-    if (changement) saveAllData();
-
-    document.getElementById("clientMsgSendBtn")?.addEventListener("click", () => {
-        const input = document.getElementById("clientMsgInput");
-        const text = input.value.trim();
-        if (!text) return;
-        messages.push({ id: Date.now(), tableId: compte.id, fromId: "table", fromNom: `Table ${compte.numeroTable} — ${compte.clientNom}`, toId: "staff", text, date: new Date().toLocaleString(), luStaff: false, luClient: true });
-        saveAllData();
-        input.value = "";
-        renderClientOrderView();
-    });
-    document.getElementById("clientMsgInput")?.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") document.getElementById("clientMsgSendBtn").click();
-    });
-
-    refreshCartUI();
-}
+// ================================================================
+// 9. ESPACE CLIENT
+// ================================================================
+// L'espace client (tablette posée sur la table) vit désormais dans sa propre
+// page dédiée : table-client.html — voir ce fichier pour la logique de
+// saisie du code d'accès et l'écran de commande. Le personnel n'a donc
+// jamais accès au formulaire de connexion client, et inversement.
 
 // ================================================================
 // 10. BARBER
@@ -1906,7 +1752,7 @@ function showToast(text, type) {
     setTimeout(() => { el.classList.add("toast-out"); setTimeout(() => el.remove(), 400); }, 5000);
 }
 function verifierNotifications() {
-    if (!currentRole && !currentClientCompteId) return;
+    if (!currentRole) return;
     if (currentUser && (currentRole === "bar" || currentRole === "hotel")) {
         const zones = currentRole === "bar" ? ["bar","vip"] : ["piscine"];
         const nouvelles = commandes.filter(c => zones.includes(c.emplacement) && !ordresVus.has(c.id));
@@ -1936,14 +1782,6 @@ function verifierNotifications() {
             });
         }
     }
-    // Messages envoyés par l'équipe vers CETTE table, côté tablette client
-    if (currentClientCompteId) {
-        const nouveauxPourClient = messages.filter(m => m.tableId === currentClientCompteId && m.fromId !== "table" && !messagesVus.has(m.id));
-        nouveauxPourClient.forEach(m => {
-            messagesVus.add(m.id);
-            showToast(`💬 ${m.fromNom} : ${m.text}`, "message");
-        });
-    }
     if (currentUser) updateNavBadges();
 }
 
@@ -1956,14 +1794,13 @@ function estEnTrainDeSaisir() {
     return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT";
 }
 setInterval(async () => {
-    if (!currentRole && !currentClientCompteId) return;
+    if (!currentRole) return;
     try {
         await reloadFromStorage();
     } catch(e) { return; } // Serveur momentanément injoignable : on réessaiera au prochain cycle
     verifierNotifications();
     if (estEnTrainDeSaisir()) return;
-    if (currentClientCompteId) { renderClientOrderView(); }
-    else if (currentRole) { refreshCurrentTab(); }
+    refreshCurrentTab();
 }, 4000);
 </script>
 </body>

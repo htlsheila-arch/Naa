@@ -15,6 +15,7 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
 const { Pool } = require("pg");
 
 const app = express();
@@ -33,6 +34,9 @@ const pool = new Pool({
 
 app.use(cors()); // ⚠️ ouvert à tous les domaines par simplicité — voir README pour restreindre en prod
 app.use(express.json({ limit: "5mb" }));
+
+// Sert les fichiers statiques du dépôt (index.html, casa-del-shei.html, etc.)
+app.use(express.static(__dirname));
 
 // ------------------------------------------------------------
 // Authentification
@@ -122,7 +126,7 @@ app.post("/api/state", async (req, res) => {
 });
 
 app.get("/", (req, res) => {
-    res.send("Complexe La Casa Del Shei — API en ligne ✅");
+    res.sendFile(path.join(__dirname, "index.html"));
 });
 
 // ------------------------------------------------------------

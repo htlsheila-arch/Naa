@@ -345,6 +345,7 @@ function buildUI() {
         tabs = [
             { id: "adminDash", label: "📊 Dashboard Global", render: renderAdminDashboard },
             { id: "manageBarPiscineHotel", label: "🏢 Bar / Piscine / Hôtel", render: renderGestionBarPiscineHotel },
+            { id: "siteWeb", label: "🌐 Site Web", render: () => renderSiteWeb("siteWeb") },
             { id: "manageTaux", label: "💱 Taux de change", render: renderTauxChange },
             { id: "manageEmployees", label: "👥 Employés", render: renderManageEmployees },
             { id: "manageBarberServices", label: "💈 Services Barber", render: renderManageBarberServices },
@@ -354,6 +355,7 @@ function buildUI() {
     } else if (currentRole === "hotel") {
         tabs = [
             { id: "hotelDash", label: "📊 Dashboard Réception", render: () => renderBusinessDashboard("hotel") },
+            { id: "siteWeb", label: "🌐 Site Web", render: () => renderSiteWeb("siteWeb") },
             { id: "hotelResa", label: "🏨 Réservations Hôtel", render: renderHotelResa },
             { id: "dispoChambres", label: "🕒 Chambres disponibles", render: () => renderDispoChambres("dispoChambres") },
             { id: "hotelServices", label: "🍽️ Services hôteliers", render: renderHotelServices },
@@ -1010,6 +1012,70 @@ function renderDispoChambres(tabId) {
     paint();
     clearInterval(dispoRefreshInterval);
     dispoRefreshInterval = setInterval(paint, 15000);
+}
+
+// ================================================================
+// SITE WEB PUBLIC — demandes de réservation et messages de contact
+// ================================================================
+function renderSiteWeb(tabId) {
+    const container = document.getElementById(tabId);
+    if (!container) return;
+    container.innerHTML = `<div class="summary">🌐 Demandes envoyées depuis le site web de l'hôtel</div>
+    <div class="card-grid">
+        <div class="card"><h3>📅 Demandes de réservation</h3><div id="siteResaList">Chargement...</div></div>
+        <div class="card"><h3>✉️ Messages de contact</h3><div id="siteMsgList">Chargement...</div></div>
+    </div>`;
+    async function refresh() {
+        try {
+            const [resaRes, msgRes] = await Promise.all([
+                fetch(`${API_BASE}/api/site-reservation-requests`),
+                fetch(`${API_BASE}/api/site-messages`)
+            ]);
+            const resas = await resaRes.json();
+            const msgs = await msgRes.json();
+            document.getElementById("siteResaList").innerHTML = resas.length ? resas.map(r => `
+                <div style="border-bottom:1px dashed #e2e8f0;padding:0.6rem 0;">
+                    <strong>${r.nom}</strong> ${r.statut === "nouvelle" ? '<span class="badge badge-attente">Nouvelle</span>' : '<span class="badge badge-servi">Traitée</span>'}<br>
+                    <span style="color:#64748b;font-size:0.85rem;">${r.type_reservation || "-"} · Arrivée: ${r.date_arrivee || "-"} · Départ: ${r.date_depart || "-"}</span><br>
+                    ${r.message ? `<em>"${r.message}"</em><br>` : ""}
+                    <span style="font-size:0.75rem;color:#94a3b8;">${new Date(r.created_at).toLocaleString()}</span>
+                    ${r.statut === "nouvelle" ? `<button data-traiter="${r.id}">✔ Marquer traitée</button>` : ""}
+                </div>
+            `).join('') : "<em>Aucune demande pour l'instant</em>";
+            document.getElementById("siteMsgList").innerHTML = msgs.length ? msgs.map(m => `
+                <div style="border-bottom:1px dashed #e2e8f0;padding:0.6rem 0;">
+                    <strong>${m.nom}</strong> ${!m.lu ? '<span class="badge badge-attente">Non lu</span>' : ''}<br>
+                    ${m.contact ? `<span style="color:#64748b;font-size:0.85rem;">📞 ${m.contact}</span><br>` : ""}
+                    ${m.message}<br>
+                    <span style="font-size:0.75rem;color:#94a3b8;">${new Date(m.created_at).toLocaleString()}</span>
+                    ${!m.lu ? `<button data-lu="${m.id}">✔ Marquer lu</button>` : ""}
+                </div>
+            `).join('') : "<em>Aucun message pour l'instant</em>";
+
+            container.querySelectorAll("[data-traiter]").forEach(btn => {
+                btn.addEventListener("click", async () => {
+                    await fetch(`${API_BASE}/api/site-reservation-requests/${btn.dataset.traiter}`, {
+                        method: "PATCH", headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ statut: "traitee" })
+                    });
+                    refresh();
+                });
+            });
+            container.querySelectorAll("[data-lu]").forEach(btn => {
+                btn.addEventListener("click", async () => {
+                    await fetch(`${API_BASE}/api/site-messages/${btn.dataset.lu}`, {
+                        method: "PATCH", headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ lu: true })
+                    });
+                    refresh();
+                });
+            });
+        } catch (e) {
+            document.getElementById("siteResaList").innerHTML = "<em style='color:#dc2626;'>Connexion au serveur impossible</em>";
+            document.getElementById("siteMsgList").innerHTML = "<em style='color:#dc2626;'>Connexion au serveur impossible</em>";
+        }
+    }
+    refresh();
 }
 
 function renderHotelResa(tabId) {

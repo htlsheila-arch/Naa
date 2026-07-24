@@ -125,6 +125,85 @@ app.get("/", (req, res) => {
     res.send("Complexe La Casa Del Shei — API en ligne ✅");
 });
 
+// ------------------------------------------------------------
+// Site web public : réservations et messages de contact
+// ------------------------------------------------------------
+// Ces deux routes sont volontairement séparées de /api/state : le site
+// public ne doit jamais pouvoir toucher aux données internes de l'app.
+app.post("/api/public/reservation-request", async (req, res) => {
+    const { nom, typeReservation, dateArrivee, dateDepart, message } = req.body || {};
+    if (!nom) return res.status(400).json({ error: "Le nom est requis" });
+    try {
+        const r = await pool.query(
+            `INSERT INTO site_reservation_requests (nom, type_reservation, date_arrivee, date_depart, message)
+             VALUES ($1,$2,$3,$4,$5) RETURNING id`,
+            [nom, typeReservation || null, dateArrivee || null, dateDepart || null, message || null]
+        );
+        res.status(201).json({ id: r.rows[0].id });
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({ error: "Erreur serveur" });
+    }
+});
+
+app.post("/api/public/message", async (req, res) => {
+    const { nom, contact, message } = req.body || {};
+    if (!nom || !message) return res.status(400).json({ error: "Nom et message requis" });
+    try {
+        const r = await pool.query(
+            `INSERT INTO site_messages (nom, contact, message) VALUES ($1,$2,$3) RETURNING id`,
+            [nom, contact || null, message]
+        );
+        res.status(201).json({ id: r.rows[0].id });
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({ error: "Erreur serveur" });
+    }
+});
+
+// Côté application (réception/admin) : consulter et traiter ces demandes
+app.get("/api/site-reservation-requests", async (req, res) => {
+    try {
+        const r = await pool.query("SELECT * FROM site_reservation_requests ORDER BY created_at DESC");
+        res.json(r.rows);
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({ error: "Erreur serveur" });
+    }
+});
+
+app.patch("/api/site-reservation-requests/:id", async (req, res) => {
+    const { statut } = req.body || {};
+    try {
+        await pool.query("UPDATE site_reservation_requests SET statut = $1 WHERE id = $2", [statut, req.params.id]);
+        res.status(204).end();
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({ error: "Erreur serveur" });
+    }
+});
+
+app.get("/api/site-messages", async (req, res) => {
+    try {
+        const r = await pool.query("SELECT * FROM site_messages ORDER BY created_at DESC");
+        res.json(r.rows);
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({ error: "Erreur serveur" });
+    }
+});
+
+app.patch("/api/site-messages/:id", async (req, res) => {
+    const { lu } = req.body || {};
+    try {
+        await pool.query("UPDATE site_messages SET lu = $1 WHERE id = $2", [lu, req.params.id]);
+        res.status(204).end();
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({ error: "Erreur serveur" });
+    }
+});
+
 app.listen(PORT, () => {
     console.log(`API démarrée sur le port ${PORT}`);
 });

@@ -110,6 +110,7 @@ let chambres = [], reservationsHotel = [], servicesHotel = [], reservationServic
 let comptesTables = [], messages = [], commandes = [];
 let ventesPiscineSessions = [], prixSeancePiscine = 5, seuilGratuitGroupe = 12, rabaisGroupePourcent = 0;
 let tauxChange = 130;
+let fraisServiceVipPourcent = 12;
 
 let currentClientCompteId = null;
 let clientCart = [];
@@ -154,6 +155,7 @@ function loadAllData() {
             comptesTables = d.comptesTables || [];
             commandes = d.commandes || [];
             tauxChange = d.tauxChange || 130;
+            fraisServiceVipPourcent = (typeof d.fraisServiceVipPourcent === "number") ? d.fraisServiceVipPourcent : 12;
             ventesPiscineSessions = d.ventesPiscineSessions || [];
             prixSeancePiscine = (typeof d.prixSeancePiscine === "number") ? d.prixSeancePiscine : 5;
             seuilGratuitGroupe = d.seuilGratuitGroupe || 12;
@@ -168,7 +170,7 @@ function saveAllData() {
         produitsBar, ventesBar,
         articlesMarket, ventesMarket,
         chambres, reservationsHotel, servicesHotel, reservationServices,
-        comptesTables, commandes, tauxChange,
+        comptesTables, commandes, tauxChange, fraisServiceVipPourcent,
         ventesPiscineSessions, prixSeancePiscine, seuilGratuitGroupe, rabaisGroupePourcent,
         messages
     };
@@ -272,6 +274,8 @@ function renderClientOrderView() {
     }
     document.getElementById("clientHeaderTitle").textContent = `🍹 Table ${compte.numeroTable}`;
     const zoneProduit = compte.emplacement === "vip" ? "vip" : "bar";
+    const estVip = compte.emplacement === "vip";
+    const prixAvecFrais = (prixBase) => estVip ? prixBase * (1 + fraisServiceVipPourcent/100) : prixBase;
     const produitsZone = produitsBar.filter(p=>p.zone===zoneProduit && p.stock>0);
     const mesCommandes = commandes.filter(c=>c.compteTableId===compte.id).slice().reverse();
 
@@ -307,8 +311,8 @@ function renderClientOrderView() {
     `).join('');
     function renderMenuListe() {
         const produits = produitsZone.filter(p => (p.categorie || "nourriture") === clientMenuCategorie);
-        document.getElementById("clientMenu").innerHTML = produits.map(p => `
-            <div class="qty-stepper"><span style="flex:1;">${p.nom} - ${formatMontant(p.prix)}</span>
+        document.getElementById("clientMenu").innerHTML = (estVip ? `<div style="font-size:0.78rem;color:#b45309;font-weight:600;margin-bottom:0.5rem;">🥂 Service VIP : +${fraisServiceVipPourcent}% inclus dans les prix affichés</div>` : "") + produits.map(p => `
+            <div class="qty-stepper"><span style="flex:1;">${p.nom} - ${formatMontant(prixAvecFrais(p.prix))}</span>
             <button data-minus="${p.id}">-</button><span id="qty_${p.id}">${(clientCart.find(i=>i.produitId===p.id)||{}).qte||0}</span><button data-plus="${p.id}">+</button></div>
         `).join('') || "<em>Aucun produit dans cette catégorie</em>";
         attacherBoutonsMenu(produits);
@@ -337,7 +341,7 @@ function renderClientOrderView() {
                 let item = clientCart.find(i=>i.produitId===id);
                 const dejaEnPanier = item ? item.qte : 0;
                 if(dejaEnPanier >= p.stock) return;
-                if(!item) { item = { produitId: id, nom: p.nom, prix: p.prix, qte: 0 }; clientCart.push(item); }
+                if(!item) { item = { produitId: id, nom: p.nom, prix: prixAvecFrais(p.prix), qte: 0 }; clientCart.push(item); }
                 item.qte++;
                 document.getElementById(`qty_${id}`).textContent = item.qte;
                 refreshCartUI();

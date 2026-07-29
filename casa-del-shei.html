@@ -191,6 +191,7 @@ function labelCategorie(key) { return (CATEGORIES_MENU.find(c=>c.key===key)||{})
 let clientMenuCategorie = "jus";
 let dispoRefreshInterval = null;
 let tauxChange = 130; // Gourdes (HTG) pour 1 Dollar ($). Modifiable par l'admin.
+let fraisServiceVipPourcent = 12; // Majoration (%) appliquée aux produits commandés depuis une table VIP. Modifiable par l'admin.
 let prixSeancePiscine = 5;      // Prix d'une séance piscine, PAR PERSONNE ($). Modifiable par l'admin.
 let seuilGratuitGroupe = 12;    // Taille de groupe pour 1 personne gratuite (ex: 12 => paient 11, 1 gratuite)
 let rabaisGroupePourcent = 0;   // Rabais groupe (%) que l'admin autorise, appliqué au choix par le personnel
@@ -228,6 +229,7 @@ function loadAllData() {
             comptesTables = d.comptesTables || [];
             commandes = d.commandes || [];
             tauxChange = d.tauxChange || 130;
+            fraisServiceVipPourcent = (typeof d.fraisServiceVipPourcent === "number") ? d.fraisServiceVipPourcent : 12;
             ventesPiscineSessions = d.ventesPiscineSessions || [];
             prixSeancePiscine = (typeof d.prixSeancePiscine === "number") ? d.prixSeancePiscine : 5;
             seuilGratuitGroupe = d.seuilGratuitGroupe || 12;
@@ -245,7 +247,7 @@ function saveAllData() {
         produitsBar, ventesBar,
         articlesMarket, ventesMarket,
         chambres, reservationsHotel, servicesHotel, reservationServices,
-        comptesTables, commandes, tauxChange,
+        comptesTables, commandes, tauxChange, fraisServiceVipPourcent,
         ventesPiscineSessions, prixSeancePiscine, seuilGratuitGroupe, rabaisGroupePourcent,
         messages
     };
@@ -469,6 +471,14 @@ function renderTauxChange() {
         <input id="convUsd" type="number" placeholder="Montant en $">
         <div id="convResult" style="font-weight:700;margin-top:0.5rem;"></div>
     </div>
+    <div class="card"><h3>🥂 Frais de service VIP</h3>
+        <div style="font-size:1.8rem;font-weight:800;" id="fraisVipActuel">${fraisServiceVipPourcent}%</div>
+        <label style="font-size:0.85rem;color:#64748b;margin-top:1rem;display:block;">Majoration appliquée aux produits commandés depuis une table VIP</label>
+        <input id="nouveauFraisVip" type="number" min="0" step="0.5" placeholder="ex: 12" value="${fraisServiceVipPourcent}">
+        <button id="btnMajFraisVip">Mettre à jour</button>
+        <div id="fraisVipMsg" style="color:#16a34a;font-weight:600;"></div>
+        <p style="font-size:0.8rem;color:#64748b;">Appliqué automatiquement sur les commandes passées depuis les tablettes des tables VIP.</p>
+    </div>
     </div>`;
     document.getElementById("btnMajTaux")?.addEventListener("click", () => {
         const val = parseFloat(document.getElementById("nouveauTaux").value);
@@ -483,6 +493,16 @@ function renderTauxChange() {
     document.getElementById("convUsd")?.addEventListener("input", (e) => {
         const val = parseFloat(e.target.value);
         document.getElementById("convResult").textContent = isNaN(val) ? "" : formatMontantTexte(val);
+    });
+    document.getElementById("btnMajFraisVip")?.addEventListener("click", () => {
+        const val = parseFloat(document.getElementById("nouveauFraisVip").value);
+        const msg = document.getElementById("fraisVipMsg");
+        if(isNaN(val) || val<0) { msg.style.color="#dc2626"; msg.textContent = "⚠️ Pourcentage invalide."; return; }
+        fraisServiceVipPourcent = val;
+        saveAllData();
+        document.getElementById("fraisVipActuel").textContent = fraisServiceVipPourcent + "%";
+        msg.style.color = "#16a34a";
+        msg.textContent = "✔ Frais de service VIP mis à jour : " + fraisServiceVipPourcent + "%";
     });
 }
 

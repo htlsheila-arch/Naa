@@ -35,8 +35,31 @@ const pool = new Pool({
 app.use(cors()); // ⚠️ ouvert à tous les domaines par simplicité — voir README pour restreindre en prod
 app.use(express.json({ limit: "5mb" }));
 
-// Sert les fichiers statiques du dépôt (index.html, casa-del-shei.html, etc.)
-app.use(express.static(__dirname));
+// ------------------------------------------------------------
+// Images (logo, photos...) — servies par extension uniquement, jamais
+// les fichiers .js/.env/.sql/.json qui sont au même endroit.
+// Il suffit de déposer un fichier image à la racine du dépôt (ex: lolo.png)
+// pour qu'il devienne accessible sur https://votre-app.onrender.com/lolo.png
+// ------------------------------------------------------------
+app.get(/\.(png|jpe?g|gif|svg|webp|ico)$/i, (req, res, next) => {
+    res.sendFile(path.join(__dirname, req.path), err => { if (err) next(); });
+});
+
+// ------------------------------------------------------------
+// Pages HTML — servies explicitement, une par une.
+// (Pas de express.static() ici : tout est à la racine du dépôt avec
+// server.js, .env, package.json... on ne veut donc PAS servir tout le
+// dossier au public, seulement ces 3 fichiers précis.)
+// ------------------------------------------------------------
+app.get(["/", "/index.html"], (req, res) => {
+    res.sendFile(path.join(__dirname, "index.html"));
+});
+app.get(["/app", "/casa-del-shei.html"], (req, res) => {
+    res.sendFile(path.join(__dirname, "casa-del-shei.html"));
+});
+app.get(["/table", "/table-client.html"], (req, res) => {
+    res.sendFile(path.join(__dirname, "table-client.html"));
+});
 
 // ------------------------------------------------------------
 // Authentification
@@ -123,10 +146,6 @@ app.post("/api/state", async (req, res) => {
         console.error(e);
         res.status(500).json({ error: "Erreur serveur" });
     }
-});
-
-app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "index.html"));
 });
 
 // ------------------------------------------------------------

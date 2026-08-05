@@ -632,7 +632,7 @@ footer { background: var(--night); color: #d7e6e2; padding: 70px 0 26px; text-al
 // ================================================================
 // ⚠️ CONFIGURATION — pointez vers votre backend une fois déployé
 // ================================================================
-const API_BASE = "https://casa-del-shei.onrender.com";
+const API_BASE = window.location.origin; // se connecte toujours au serveur qui héberge cette page, quel que soit le domaine
 
 // ================================================================
 // CONTENU DU SITE

@@ -190,6 +190,7 @@ const CATEGORIES_MENU = [
 function labelCategorie(key) { return (CATEGORIES_MENU.find(c=>c.key===key)||{}).label || "🍽️ Nourritures"; }
 let clientMenuCategorie = "jus";
 let dispoRefreshInterval = null;
+let gbphActiveKey = null; // mémorise la sous-section active de "Bar/Piscine/Hôtel" pour ne pas revenir au début à chaque rafraîchissement
 let tauxChange = 130; // Gourdes (HTG) pour 1 Dollar ($). Modifiable par l'admin.
 let fraisServiceVipPourcent = 12; // Majoration (%) appliquée aux produits commandés depuis une table VIP. Modifiable par l'admin.
 let prixSeancePiscine = 5;      // Prix d'une séance piscine, PAR PERSONNE ($). Modifiable par l'admin.
@@ -580,6 +581,10 @@ function renderGestionBarPiscineHotel() {
         { key: "servicesHotel", label: "🍽️ Services Hôtel (catalogue)", render: () => renderManageHotelServices("gbphContent") },
         { key: "servicesAppliquer", label: "🧾 Appliquer un service", render: () => renderHotelServices("gbphContent") }
     ];
+    // On reste sur la sous-section où l'utilisateur était (mémorisée dans gbphActiveKey),
+    // au lieu de revenir systématiquement à la première à chaque rafraîchissement automatique.
+    let activeIdx = sections.findIndex(s => s.key === gbphActiveKey);
+    if (activeIdx === -1) activeIdx = 0;
     container.innerHTML = `<div class="summary">🏢 Gestion consolidée : Bar, Piscine et Hôtel</div>
         <div id="gbphSubNav" style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:1.2rem;"></div>
         <div id="gbphContent"></div>`;
@@ -588,16 +593,18 @@ function renderGestionBarPiscineHotel() {
         const btn = document.createElement("button");
         btn.type = "button";
         btn.textContent = sec.label;
-        btn.style.background = idx === 0 ? "#f97316" : "#334155";
+        btn.style.background = idx === activeIdx ? "#f97316" : "#334155";
         btn.addEventListener("click", () => {
             clearInterval(dispoRefreshInterval);
+            gbphActiveKey = sec.key;
             subNav.querySelectorAll("button").forEach(b => b.style.background = "#334155");
             btn.style.background = "#f97316";
             sec.render();
         });
         subNav.appendChild(btn);
     });
-    sections[0].render();
+    gbphActiveKey = sections[activeIdx].key;
+    sections[activeIdx].render();
 }
 
 // ================================================================
@@ -1742,6 +1749,7 @@ document.getElementById("backToLoginFromRole")?.addEventListener("click", () => 
 document.getElementById("logoutBtn")?.addEventListener("click", () => {
     stopMarketScanner();
     clearInterval(dispoRefreshInterval);
+    gbphActiveKey = null;
     currentRole = "";
     document.getElementById("mainApp").style.display = "none";
     document.getElementById("loginScreen").style.display = "block";

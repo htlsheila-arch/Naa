@@ -213,7 +213,13 @@ function formatMontantTexte(usd) {
 // ================================================================
 function loadAllData() {
     return fetch(`${API_BASE}/api/state`)
-        .then(res => { if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
+        .then(async res => {
+            if (!res.ok) {
+                const body = await res.json().catch(() => ({}));
+                throw new Error(body.detail ? ("Erreur serveur (" + res.status + ") : " + body.detail) : ("HTTP " + res.status));
+            }
+            return res.json();
+        })
         .then(d => {
             servicesBarber = d.servicesBarber || [];
             coiffeurs = d.coiffeurs || [];
@@ -1079,8 +1085,8 @@ function renderSiteWeb(tabId) {
                 });
             });
         } catch (e) {
-            document.getElementById("siteResaList").innerHTML = "<em style='color:#dc2626;'>Connexion au serveur impossible</em>";
-            document.getElementById("siteMsgList").innerHTML = "<em style='color:#dc2626;'>Connexion au serveur impossible</em>";
+            document.getElementById("siteResaList").innerHTML = `<em style='color:#dc2626;'>Connexion au serveur impossible : ${e.message}</em>`;
+            document.getElementById("siteMsgList").innerHTML = `<em style='color:#dc2626;'>Connexion au serveur impossible : ${e.message}</em>`;
         }
     }
     refresh();
@@ -1674,7 +1680,7 @@ async function entrerDansApp(emp, role) {
     try {
         await loadAllData();
     } catch(e) {
-        document.getElementById("loginError").innerText = "Connexion au serveur impossible. Réessayez.";
+        document.getElementById("loginError").innerText = "Connexion au serveur impossible : " + e.message;
         document.getElementById("loginScreen").style.display = "block";
         return;
     }
@@ -1697,7 +1703,11 @@ document.getElementById("loginBtn")?.addEventListener("click", async () => {
             body: JSON.stringify({ username, password })
         });
         if (!res.ok) {
-            errDiv.innerText = res.status === 401 ? "Identifiants incorrects" : "Erreur de connexion au serveur.";
+            if (res.status === 401) { errDiv.innerText = "Identifiants incorrects"; }
+            else {
+                const errBody = await res.json().catch(() => ({}));
+                errDiv.innerText = "Erreur serveur (" + res.status + ")" + (errBody.detail ? " : " + errBody.detail : "");
+            }
             return;
         }
         emp = await res.json();

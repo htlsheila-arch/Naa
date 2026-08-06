@@ -32,6 +32,13 @@ const pool = new Pool({
     ssl: { rejectUnauthorized: false } // requis par Neon
 });
 
+// Test de connexion immédiat au démarrage — regardez les LOGS Render juste après
+// un déploiement : cette ligne vous dit tout de suite si la base répond ou non,
+// et pourquoi, sans avoir besoin d'essayer de vous connecter depuis le site.
+pool.query("SELECT 1")
+    .then(() => console.log("✅ Connexion à la base de données Neon réussie."))
+    .catch(e => console.error("❌ ÉCHEC de connexion à la base de données au démarrage —", e.message));
+
 app.use(cors()); // ⚠️ ouvert à tous les domaines par simplicité — voir README pour restreindre en prod
 app.use(express.json({ limit: "5mb" }));
 
@@ -76,7 +83,7 @@ app.post("/api/login", async (req, res) => {
         res.json(result.rows[0]);
     } catch (e) {
         console.error(e);
-        res.status(500).json({ error: "Erreur serveur" });
+        res.status(500).json({ error: "Erreur serveur", detail: e.message, code: e.code || null });
     }
 });
 
@@ -89,7 +96,7 @@ app.get("/api/employees", async (req, res) => {
         res.json(result.rows);
     } catch (e) {
         console.error(e);
-        res.status(500).json({ error: "Erreur serveur" });
+        res.status(500).json({ error: "Erreur serveur", detail: e.message, code: e.code || null });
     }
 });
 
@@ -107,7 +114,7 @@ app.post("/api/employees", async (req, res) => {
     } catch (e) {
         if (e.code === "23505") return res.status(409).json({ error: "Ce login existe déjà" });
         console.error(e);
-        res.status(500).json({ error: "Erreur serveur" });
+        res.status(500).json({ error: "Erreur serveur", detail: e.message, code: e.code || null });
     }
 });
 
@@ -117,7 +124,7 @@ app.delete("/api/employees/:id", async (req, res) => {
         res.status(204).end();
     } catch (e) {
         console.error(e);
-        res.status(500).json({ error: "Erreur serveur" });
+        res.status(500).json({ error: "Erreur serveur", detail: e.message, code: e.code || null });
     }
 });
 
@@ -130,7 +137,7 @@ app.get("/api/state", async (req, res) => {
         res.json(result.rows[0] ? result.rows[0].data : {});
     } catch (e) {
         console.error(e);
-        res.status(500).json({ error: "Erreur serveur" });
+        res.status(500).json({ error: "Erreur serveur", detail: e.message, code: e.code || null });
     }
 });
 
@@ -144,7 +151,7 @@ app.post("/api/state", async (req, res) => {
         res.status(204).end();
     } catch (e) {
         console.error(e);
-        res.status(500).json({ error: "Erreur serveur" });
+        res.status(500).json({ error: "Erreur serveur", detail: e.message, code: e.code || null });
     }
 });
 
@@ -165,7 +172,7 @@ app.post("/api/public/reservation-request", async (req, res) => {
         res.status(201).json({ id: r.rows[0].id });
     } catch (e) {
         console.error(e);
-        res.status(500).json({ error: "Erreur serveur" });
+        res.status(500).json({ error: "Erreur serveur", detail: e.message, code: e.code || null });
     }
 });
 
@@ -180,7 +187,7 @@ app.post("/api/public/message", async (req, res) => {
         res.status(201).json({ id: r.rows[0].id });
     } catch (e) {
         console.error(e);
-        res.status(500).json({ error: "Erreur serveur" });
+        res.status(500).json({ error: "Erreur serveur", detail: e.message, code: e.code || null });
     }
 });
 
@@ -191,7 +198,7 @@ app.get("/api/site-reservation-requests", async (req, res) => {
         res.json(r.rows);
     } catch (e) {
         console.error(e);
-        res.status(500).json({ error: "Erreur serveur" });
+        res.status(500).json({ error: "Erreur serveur", detail: e.message, code: e.code || null });
     }
 });
 
@@ -202,7 +209,7 @@ app.patch("/api/site-reservation-requests/:id", async (req, res) => {
         res.status(204).end();
     } catch (e) {
         console.error(e);
-        res.status(500).json({ error: "Erreur serveur" });
+        res.status(500).json({ error: "Erreur serveur", detail: e.message, code: e.code || null });
     }
 });
 
@@ -212,7 +219,7 @@ app.get("/api/site-messages", async (req, res) => {
         res.json(r.rows);
     } catch (e) {
         console.error(e);
-        res.status(500).json({ error: "Erreur serveur" });
+        res.status(500).json({ error: "Erreur serveur", detail: e.message, code: e.code || null });
     }
 });
 
@@ -223,7 +230,7 @@ app.patch("/api/site-messages/:id", async (req, res) => {
         res.status(204).end();
     } catch (e) {
         console.error(e);
-        res.status(500).json({ error: "Erreur serveur" });
+        res.status(500).json({ error: "Erreur serveur", detail: e.message, code: e.code || null });
     }
 });
 

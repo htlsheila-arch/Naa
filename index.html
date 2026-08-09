@@ -578,6 +578,16 @@ footer { background: var(--night); color: #d7e6e2; padding: 70px 0 26px; text-al
                 </div>
                 <div class="form-row">
                     <div class="form-group">
+                        <label for="resTelephone">Téléphone</label>
+                        <input id="resTelephone" type="tel" placeholder="Votre numéro" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="resEmail">Email</label>
+                        <input id="resEmail" type="email" placeholder="Votre email (optionnel)">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
                         <label for="resArrivee">Date d'arrivée</label>
                         <input id="resArrivee" type="date" required>
                     </div>
@@ -598,6 +608,7 @@ footer { background: var(--night); color: #d7e6e2; padding: 70px 0 26px; text-al
 </section>
 
 <!-- FOOTER -->
+
 <footer>
     <div class="container">
         <img src="lolo.png" alt="Logo La Casa Del Shei" class="footer-logo-img" onerror="this.remove()">
@@ -888,10 +899,12 @@ function initReservationForm() {
         e.preventDefault();
         const nom = document.getElementById('resNom').value.trim();
         const typeReservation = document.getElementById('resType').value;
+        const telephone = document.getElementById('resTelephone').value.trim();
+        const email = document.getElementById('resEmail').value.trim();
         const dateArrivee = document.getElementById('resArrivee').value;
         const dateDepart = document.getElementById('resDepart').value;
         const message = document.getElementById('resMessage').value.trim();
-        if (!nom || !dateArrivee) return;
+        if (!nom || !telephone || !dateArrivee) return;
         btn.disabled = true;
         btn.textContent = "Envoi en cours...";
         feedback.className = 'form-feedback';
@@ -899,7 +912,7 @@ function initReservationForm() {
             const res = await fetch(`${API_BASE}/api/public/reservation-request`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ nom, typeReservation, dateArrivee, dateDepart, message })
+                body: JSON.stringify({ nom, typeReservation, telephone, email, dateArrivee, dateDepart, message })
             });
             if (!res.ok) throw new Error('HTTP ' + res.status);
             feedback.innerHTML = '<span class="check-pop"><i class="fas fa-check"></i></span> Merci ! Votre demande a été reçue — notre réception vous contactera très prochainement.';

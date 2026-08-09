@@ -2,8 +2,19 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
 <title>La Casa Del Shei — Ma Table</title>
+
+<!-- Installation en app sur tablette (PWA) -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#f97316">
+<link rel="icon" type="image/png" href="/lolo.png">
+<link rel="apple-touch-icon" href="/lolo.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Commande Table">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -86,6 +97,7 @@ h1, h2, h3, .brand { font-family: 'Fredoka', 'Inter', sans-serif; }
             <button id="clientCodeSubmit" type="button" class="gold-btn">Accéder à mon compte</button>
         </div>
         <div class="help-text">Besoin d'aide ? Adressez-vous à un membre du personnel.</div>
+        <button id="installBtn" type="button" class="gold-btn" style="display:none;margin-top:1rem;background:#334155;color:white;">📲 Installer sur cette tablette</button>
     </div>
 </div>
 
@@ -430,6 +442,33 @@ setInterval(async () => {
     if (estEnTrainDeSaisir()) return;
     renderClientOrderView();
 }, 4000);
+
+// ================================================================
+// INSTALLATION SUR LA TABLETTE (PWA)
+// ================================================================
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/sw.js").catch(() => {});
+    });
+}
+let evenementInstallDiffere = null;
+window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    evenementInstallDiffere = e;
+    const btn = document.getElementById("installBtn");
+    if (btn) btn.style.display = "inline-block";
+});
+document.getElementById("installBtn")?.addEventListener("click", async () => {
+    if (!evenementInstallDiffere) return;
+    evenementInstallDiffere.prompt();
+    await evenementInstallDiffere.userChoice;
+    evenementInstallDiffere = null;
+    document.getElementById("installBtn").style.display = "none";
+});
+window.addEventListener("appinstalled", () => {
+    const btn = document.getElementById("installBtn");
+    if (btn) btn.style.display = "none";
+});
 </script>
 </body>
 </html>

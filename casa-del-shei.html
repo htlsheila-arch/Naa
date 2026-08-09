@@ -196,6 +196,7 @@ let fraisServiceVipPourcent = 12; // Majoration (%) appliquée aux produits comm
 let prixSeancePiscine = 5;      // Prix d'une séance piscine, PAR PERSONNE ($). Modifiable par l'admin.
 let seuilGratuitGroupe = 12;    // Taille de groupe pour 1 personne gratuite (ex: 12 => paient 11, 1 gratuite)
 let rabaisGroupePourcent = 0;   // Rabais groupe (%) que l'admin autorise, appliqué au choix par le personnel
+let dureeMomentHeures = 2;      // Durée d'un "Moment" en chambre, en heures. Modifiable par l'admin.
 
 const NB_TABLES = 30;
 
@@ -241,6 +242,7 @@ function loadAllData() {
             prixSeancePiscine = (typeof d.prixSeancePiscine === "number") ? d.prixSeancePiscine : 5;
             seuilGratuitGroupe = d.seuilGratuitGroupe || 12;
             rabaisGroupePourcent = (typeof d.rabaisGroupePourcent === "number") ? d.rabaisGroupePourcent : 0;
+            dureeMomentHeures = (typeof d.dureeMomentHeures === "number") ? d.dureeMomentHeures : 2;
             messages = d.messages || [];
         })
         .then(() => fetch(`${API_BASE}/api/employees`))
@@ -256,7 +258,7 @@ function saveAllData() {
         chambres, reservationsHotel, servicesHotel, reservationServices,
         comptesTables, commandes, tauxChange, fraisServiceVipPourcent,
         ventesPiscineSessions, prixSeancePiscine, seuilGratuitGroupe, rabaisGroupePourcent,
-        messages
+        dureeMomentHeures, messages
     };
     // Best-effort : on n'attend pas la réponse pour ne pas bloquer l'interface (comme avant avec localStorage)
     fetch(`${API_BASE}/api/state`, {
@@ -354,7 +356,7 @@ function buildUI() {
             { id: "siteWeb", label: "🌐 Site Web", render: () => renderSiteWeb("siteWeb") },
             { id: "hotelResa", label: "🏨 Réservations Hôtel", render: renderHotelResa },
             { id: "dispoChambres", label: "🕒 Chambres disponibles", render: () => renderDispoChambres("dispoChambres") },
-            { id: "hotelServices", label: "🍽️ Services hôteliers", render: renderHotelServices },
+            { id: "hotelServices", label: "🧾 Facturer un service", render: renderHotelServices },
             { id: "hotelPiscineComptes", label: "💳 Comptes Tables Piscine", render: () => renderComptesTables("hotelPiscineComptes", "piscine") },
             { id: "hotelPiscineCommandes", label: "📥 Commandes Bar Piscine", render: () => renderCommandesQueue("piscine", "hotelPiscineCommandes") },
             { id: "hotelPiscineSessions", label: "🏊 Séances Piscine", render: () => renderVentePiscineSession("hotelPiscineSessions") }
@@ -954,13 +956,32 @@ function renderManageChambres(tabId) {
     tabId = tabId || "manageChambres";
     const container = document.getElementById(tabId);
     if(!container) return;
-    container.innerHTML = `<div class="summary">🛏️ Gestion des chambres — 4 tarifs par chambre : Moment (2h), Nuit, Semaine, Mois</div><div class="card-grid"><div class="card"><h3>➕ Ajouter chambre</h3>
+    container.innerHTML = `<div class="summary">🛏️ Gestion des chambres — 4 tarifs par chambre : Moment (${dureeMomentHeures}h), Nuit, Semaine, Mois</div>
+    <div class="card-grid">
+    <div class="card"><h3>⏱️ Durée d'un "Moment"</h3>
+        <div style="font-size:1.4rem;font-weight:800;" id="dureeMomentActuelle">${dureeMomentHeures} heure${dureeMomentHeures>1?'s':''}</div>
+        <label style="font-size:0.85rem;color:#64748b;">Nouvelle durée (en heures)</label>
+        <input id="nvDureeMoment" type="number" min="1" step="0.5" value="${dureeMomentHeures}">
+        <button id="btnMajDureeMoment">Mettre à jour</button>
+        <p style="font-size:0.8rem;color:#64748b;">S'applique à toutes les chambres, pour toute réservation "Moment" future.</p>
+    </div>
+    <div class="card"><h3>➕ Ajouter chambre</h3>
     <input id="chNumero" placeholder="Numéro"><input id="chType" placeholder="Type">
-    <label style="font-size:0.8rem;color:#64748b;">Tarif Moment (2h) — $</label><input id="chPrixMoment" type="number" placeholder="Ex: 15">
+    <label style="font-size:0.8rem;color:#64748b;">Tarif Moment (${dureeMomentHeures}h) — $</label><input id="chPrixMoment" type="number" placeholder="Ex: 15">
     <label style="font-size:0.8rem;color:#64748b;">Tarif par nuit — $</label><input id="chPrix" type="number" placeholder="Ex: 50">
     <label style="font-size:0.8rem;color:#64748b;">Tarif par semaine — $</label><input id="chPrixSemaine" type="number" placeholder="Ex: 300">
     <label style="font-size:0.8rem;color:#64748b;">Tarif par mois — $</label><input id="chPrixMois" type="number" placeholder="Ex: 1200">
-    <button id="addChambre">Ajouter</button></div><div class="card"><h3>📋 Liste chambres</h3><div id="listChambres"></div></div></div>`;
+    <button id="addChambre">Ajouter</button></div>
+    <div class="card"><h3>📋 Liste chambres</h3><div id="listChambres"></div></div>
+    </div>`;
+    document.getElementById("btnMajDureeMoment")?.addEventListener("click", () => {
+        const val = parseFloat(document.getElementById("nvDureeMoment").value);
+        if(isNaN(val) || val<=0) return alert("Durée invalide");
+        dureeMomentHeures = val;
+        saveAllData();
+        document.getElementById("dureeMomentActuelle").textContent = val + " heure" + (val>1?"s":"");
+        alert("Durée du Moment mise à jour : " + val + "h. Rechargez cet onglet pour voir les libellés à jour ailleurs.");
+    });
     function refresh() {
         const listDiv = document.getElementById("listChambres");
         if(listDiv) listDiv.innerHTML = chambres.map(c => `<div style="margin-bottom:0.6rem;"><strong>${c.numero}</strong> - ${c.type} - ${c.statut}<br>
@@ -1057,6 +1078,7 @@ function renderSiteWeb(tabId) {
             document.getElementById("siteResaList").innerHTML = resas.length ? resas.map(r => `
                 <div style="border-bottom:1px dashed #e2e8f0;padding:0.6rem 0;">
                     <strong>${r.nom}</strong> ${r.statut === "nouvelle" ? '<span class="badge badge-attente">Nouvelle</span>' : '<span class="badge badge-servi">Traitée</span>'}<br>
+                    <span style="color:#64748b;font-size:0.85rem;">📞 ${r.telephone || "-"}${r.email ? " · ✉️ "+r.email : ""}</span><br>
                     <span style="color:#64748b;font-size:0.85rem;">${r.type_reservation || "-"} · Arrivée: ${r.date_arrivee || "-"} · Départ: ${r.date_depart || "-"}</span><br>
                     ${r.message ? `<em>"${r.message}"</em><br>` : ""}
                     <span style="font-size:0.75rem;color:#94a3b8;">${new Date(r.created_at).toLocaleString()}</span>
@@ -1139,13 +1161,13 @@ function renderHotelResa(tabId) {
         const ch = chambreSelectionnee();
         const tarifs = { moment: ch?.prixMoment, nuit: ch?.prixParNuit, semaine: ch?.prixSemaine, mois: ch?.prixMois };
         const montant = ch ? (tarifs[type] || 0) * qte : 0;
-        const heuresParUnite = { moment: 2, nuit: 24, semaine: 24*7, mois: 24*30 };
+        const heuresParUnite = { moment: dureeMomentHeures, nuit: 24, semaine: 24*7, mois: 24*30 };
         const dateDebut = new Date();
         const dateFin = new Date(dateDebut.getTime() + qte * heuresParUnite[type] * 3600 * 1000);
         return { type, qte, montant, dateDebut, dateFin };
     }
     function refreshRecap() {
-        document.getElementById("resaQuantiteLabel").textContent = "Nombre de " + { moment: "moments (2h chacun)", nuit: "nuits", semaine: "semaines", mois: "mois" }[document.getElementById("resaTypeDuree").value];
+        document.getElementById("resaQuantiteLabel").textContent = "Nombre de " + { moment: `moments (${dureeMomentHeures}h chacun)`, nuit: "nuits", semaine: "semaines", mois: "mois" }[document.getElementById("resaTypeDuree").value];
         const s = calculerSejour();
         document.getElementById("resaRecap").innerHTML = `Départ prévu : <strong>${s.dateFin.toLocaleString()}</strong><br>Total à payer : <strong>${formatMontant(s.montant)}</strong>`;
     }
@@ -1198,9 +1220,9 @@ function renderHotelServices(tabId) {
     tabId = tabId || "hotelServices";
     const container = document.getElementById(tabId);
     if(!container) return;
-    container.innerHTML = `<div class="summary">🍽️ Services hôtel (ajouter à une réservation)</div>
-    <div class="card-grid"><div class="card"><h3>➕ Ajouter service</h3><select id="selResa"></select><select id="selService"></select><input id="qteService" type="number" value="1"><button id="addServiceToResa">Ajouter</button></div>
-    <div class="card"><h3>📋 Services consommés</h3><div id="listServicesResa"></div></div></div>`;
+    container.innerHTML = `<div class="summary">🧾 Facturer un service à un client — vous choisissez uniquement parmi les services et tarifs déjà définis par l'admin. Vous ne pouvez ni créer un nouveau service, ni modifier un prix ici.</div>
+    <div class="card-grid"><div class="card"><h3>🧾 Facturer un service existant</h3><select id="selResa"></select><select id="selService"></select><input id="qteService" type="number" value="1"><button id="addServiceToResa">Facturer au client</button></div>
+    <div class="card"><h3>📋 Services facturés</h3><div id="listServicesResa"></div></div></div>`;
     function refresh() {
         const selResa = document.getElementById("selResa");
         if(selResa) selResa.innerHTML = reservationsHotel.map(r => {
@@ -1262,6 +1284,10 @@ function renderComptesTables(tabId, emplacementsAutorises) {
     <button id="ctOuvrir" type="button">Ouvrir le compte & imprimer</button>
     </div>
     <div class="card"><h3>📋 Comptes ouverts${zoneUnique ? " — " + emplacementLabels[zoneUnique] : ""}</h3><div id="ctList"></div></div>
+    </div>
+    <div class="card" style="margin-top:1.5rem;">
+        <h3>🍽️ Tables disponibles</h3>
+        <div id="ctTablesGrid" class="room-grid"></div>
     </div>`;
     function nextTable() { const d = tablesDisponibles(); return d.length ? d[0] : null; }
     function genererCodeAcces() {
@@ -1295,6 +1321,20 @@ function renderComptesTables(tabId, emplacementsAutorises) {
                 }
             });
         });
+        const grid = document.getElementById("ctTablesGrid");
+        if (grid) {
+            const occupeesToutesZones = comptesTables.filter(c=>c.statut==="ouvert");
+            let html = "";
+            for (let i = 1; i <= NB_TABLES; i++) {
+                const occ = occupeesToutesZones.find(c => c.numeroTable === i);
+                if (occ) {
+                    html += `<div class="room-card occupee"><div class="roomnum">${i}</div><div style="font-size:0.8rem;">${emplacementLabels[occ.emplacement]||occ.emplacement}<br>${occ.clientNom}</div></div>`;
+                } else {
+                    html += `<div class="room-card libre"><div class="roomnum">${i}</div><div style="font-size:0.8rem;">Disponible</div></div>`;
+                }
+            }
+            grid.innerHTML = html;
+        }
     }
     document.getElementById("ctOuvrir")?.addEventListener("click", () => {
         const errDiv = document.getElementById("ctErrorMsg");
@@ -1318,7 +1358,7 @@ function renderComptesTables(tabId, emplacementsAutorises) {
         document.getElementById("ctMontant").value = "";
         document.getElementById("ctEquivalent").textContent = "";
         refresh();
-        printReceipt("Ouverture compte table", [`Client: ${client}`, `Table attribuée: n°${num}`, `Zone: ${emplacementLabels[emplacement]}`, `Dépôt: ${formatMontantTexte(montantUsd)}`, `CODE D'ACCÈS TABLETTE: ${codeAcces}`], montantUsd);
+        printReceipt("Ouverture compte table", [`Client: ${client}`, `Zone: ${emplacementLabels[emplacement]}`, `Dépôt: ${formatMontantTexte(montantUsd)}`, `CODE D'ACCÈS TABLETTE: ${codeAcces}`, `Table attribuée: n°${num}`], montantUsd);
         alert(`Compte ouvert — Table ${num}\nCode d'accès à donner au client : ${codeAcces}`);
     });
     refresh();

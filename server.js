@@ -68,6 +68,19 @@ app.get(["/table", "/table-client.html"], (req, res) => {
     res.sendFile(path.join(__dirname, "table-client.html"));
 });
 
+// Fichiers nécessaires pour installer "table-client.html" comme une app
+// sur les tablettes (icône sur l'écran d'accueil, plein écran).
+app.get("/manifest.json", (req, res) => {
+    res.sendFile(path.join(__dirname, "manifest.json"));
+});
+app.get("/sw.js", (req, res) => {
+    // Un service worker doit être servi depuis la racine pour pouvoir contrôler
+    // toute la page ; ce header n'est pas obligatoire mais évite des soucis de
+    // mise en cache du fichier lui-même par certains navigateurs.
+    res.setHeader("Service-Worker-Allowed", "/");
+    res.sendFile(path.join(__dirname, "sw.js"));
+});
+
 // ------------------------------------------------------------
 // Authentification
 // ------------------------------------------------------------
@@ -161,13 +174,13 @@ app.post("/api/state", async (req, res) => {
 // Ces deux routes sont volontairement séparées de /api/state : le site
 // public ne doit jamais pouvoir toucher aux données internes de l'app.
 app.post("/api/public/reservation-request", async (req, res) => {
-    const { nom, typeReservation, dateArrivee, dateDepart, message } = req.body || {};
+    const { nom, typeReservation, telephone, email, dateArrivee, dateDepart, message } = req.body || {};
     if (!nom) return res.status(400).json({ error: "Le nom est requis" });
     try {
         const r = await pool.query(
-            `INSERT INTO site_reservation_requests (nom, type_reservation, date_arrivee, date_depart, message)
-             VALUES ($1,$2,$3,$4,$5) RETURNING id`,
-            [nom, typeReservation || null, dateArrivee || null, dateDepart || null, message || null]
+            `INSERT INTO site_reservation_requests (nom, telephone, email, type_reservation, date_arrivee, date_depart, message)
+             VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING id`,
+            [nom, telephone || null, email || null, typeReservation || null, dateArrivee || null, dateDepart || null, message || null]
         );
         res.status(201).json({ id: r.rows[0].id });
     } catch (e) {

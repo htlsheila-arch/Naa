@@ -1,0 +1,16 @@
+{
+  "name": "La Casa Del Shei - Commande Table",
+  "short_name": "Commande Table",
+  "description": "Passez votre commande directement depuis la table.",
+  "start_url": "/table",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0f172a",
+  "theme_color": "#f97316",
+  "icons": [
+    { "src": "/lolo.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/lolo.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/lolo.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" }
+  ]
+}

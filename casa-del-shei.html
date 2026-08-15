@@ -275,13 +275,26 @@ function reloadFromStorage() {
 // ================================================================
 // 3. UTILITAIRES
 // ================================================================
-function printReceipt(title, lines, totalUsd) {
+function printReceipt(title, lines, totalUsd, options) {
     // IMPORTANT: cette fonction ne doit JAMAIS lever d'erreur qui bloquerait le reste du
     // traitement (sauvegarde des données, rafraîchissement de l'écran). L'impression est
     // une opération "best effort" — si elle échoue (popup bloqué, WebView Android sans
     // support window.open, etc.) on l'ignore silencieusement.
+    options = options || {};
     try {
         const total = typeof totalUsd === "number" ? totalUsd : parseFloat(totalUsd) || 0;
+        const barcodeHtml = options.barcodeValue ? `
+            <div style="text-align:center;margin-top:0.8rem;">
+                <svg id="barcodeSvg"></svg>
+                <div style="font-size:0.7rem;letter-spacing:0.1em;">${options.barcodeValue}</div>
+            </div>
+            <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"><\/script>
+            <script>
+                try {
+                    JsBarcode("#barcodeSvg", ${JSON.stringify(options.barcodeValue)}, { height: 40, width: 1.6, fontSize: 10, margin: 4 });
+                } catch(e) {}
+            <\/script>` : "";
+        const noteHtml = options.footerNote ? `<p style="text-align:center; font-size:0.78rem; font-weight:bold; margin-top:0.5rem;">${options.footerNote}</p>` : "";
         let content = `<div style="font-family: monospace; width: 280px; margin:0 auto; padding:1rem;">
             <h3 style="text-align:center">🏨 COMPLEXE LA CASA DEL SHEI</h3>
             <p style="text-align:center">${title}</p>
@@ -289,6 +302,8 @@ function printReceipt(title, lines, totalUsd) {
             ${lines.map(l => `<div>${l}</div>`).join('')}
             <hr/>
             <div style="font-weight:bold">TOTAL : ${formatMontantTexte(total)}</div>
+            ${noteHtml}
+            ${barcodeHtml}
             <p style="text-align:center; font-size:0.8rem;">${new Date().toLocaleString()}</p>
             </div>`;
         // 1) Pont natif Android éventuel (comme pour l'impression thermique Sunmi)
@@ -300,8 +315,8 @@ function printReceipt(title, lines, totalUsd) {
         let win = window.open();
         if (!win) { console.warn("Impression: fenêtre bloquée par le navigateur"); return; }
         win.document.write(content);
-        win.print();
-        win.close();
+        if (!options.barcodeValue) win.print();
+        else setTimeout(() => win.print(), 400); // laisse le temps au code-barres de se dessiner
     } catch (e) {
         console.warn("Impression indisponible sur cet appareil:", e);
     }
@@ -357,15 +372,15 @@ function buildUI() {
             { id: "hotelResa", label: "🏨 Réservations Hôtel", render: renderHotelResa },
             { id: "dispoChambres", label: "🕒 Chambres disponibles", render: () => renderDispoChambres("dispoChambres") },
             { id: "hotelServices", label: "🧾 Facturer un service", render: renderHotelServices },
-            { id: "hotelPiscineComptes", label: "💳 Comptes Tables Piscine", render: () => renderComptesTables("hotelPiscineComptes", "piscine") },
-            { id: "hotelPiscineCommandes", label: "📥 Commandes Bar Piscine", render: () => renderCommandesQueue("piscine", "hotelPiscineCommandes") },
+            { id: "hotelPiscineVenteDirecte", label: "🧾 Vente Directe (Piscine)", render: () => renderVenteDirecte("hotelPiscineVenteDirecte", "piscine", "Bar Piscine") },
             { id: "hotelPiscineSessions", label: "🏊 Séances Piscine", render: () => renderVentePiscineSession("hotelPiscineSessions") }
         ];
     } else if (currentRole === "bar") {
         tabs = [
             { id: "barDash", label: "📊 Dashboard Bar & VIP", render: () => renderBusinessDashboard(["bar","vip"], "barDash") },
-            { id: "barComptesTables", label: "💳 Comptes Tables", render: () => renderComptesTables("barComptesTables", ["bar","vip"]) },
-            { id: "barCommandes", label: "📥 Commandes Bar & VIP", render: () => renderCommandesQueue(["bar","vip"], "barCommandes") }
+            { id: "barVenteDirecte", label: "🧾 Vente Directe (Bar)", render: () => renderVenteDirecte("barVenteDirecte", "bar", "Bar") },
+            { id: "barComptesTables", label: "💳 Comptes Tables (VIP)", render: () => renderComptesTables("barComptesTables", "vip") },
+            { id: "barCommandes", label: "📥 Commandes VIP", render: () => renderCommandesQueue("vip", "barCommandes") }
         ];
     } else if (currentRole === "barber") {
         tabs = [
@@ -416,10 +431,7 @@ function updateNavBadges() {
         if (tabId === "messagerie") {
             count = totalMessagesNonLus();
         } else if (tabId === "barCommandes") {
-            const zones = currentRole === "bar" ? ["bar","vip"] : [currentRole];
-            count = commandes.filter(c => zones.includes(c.emplacement) && c.statut !== "servi").length;
-        } else if (tabId === "hotelPiscineCommandes") {
-            count = commandes.filter(c => c.emplacement === "piscine" && c.statut !== "servi").length;
+            count = commandes.filter(c => c.emplacement === "vip" && c.statut !== "servi").length;
         }
         if (count > 0) { badge.style.display = "inline-block"; badge.textContent = count > 99 ? "99+" : count; }
         else { badge.style.display = "none"; }
@@ -574,7 +586,9 @@ function renderGestionBarPiscineHotel() {
     if(!container) return;
     const sections = [
         { key: "produits", label: "🍻 Produits Bar & VIP", render: () => renderManageBarProducts("gbphContent") },
-        { key: "comptes", label: "💳 Comptes Tables", render: () => renderComptesTables("gbphContent") },
+        { key: "venteDirecteBar", label: "🧾 Vente Directe (Bar)", render: () => renderVenteDirecte("gbphContent", "bar", "Bar") },
+        { key: "venteDirectePiscine", label: "🧾 Vente Directe (Piscine)", render: () => renderVenteDirecte("gbphContent", "piscine", "Bar Piscine") },
+        { key: "comptes", label: "💳 Comptes Tables (VIP)", render: () => renderComptesTables("gbphContent", "vip") },
         { key: "reglagesPiscine", label: "🏊 Réglages Piscine", render: () => renderReglagesPiscine("gbphContent") },
         { key: "seancesPiscine", label: "🏊 Séances Piscine", render: () => renderVentePiscineSession("gbphContent") },
         { key: "chambresGestion", label: "🛏️ Chambres (gestion)", render: () => renderManageChambres("gbphContent") },
@@ -1367,6 +1381,89 @@ function renderComptesTables(tabId, emplacementsAutorises) {
 // ================================================================
 // 8. FILE DE COMMANDES (côté personnel bar / piscine / vip)
 // ================================================================
+// ================================================================
+// VENTE DIRECTE AU COMPTOIR (Bar & Piscine — pas de compte/code, paiement immédiat)
+// ================================================================
+function renderVenteDirecte(tabId, zone, zoneLabel) {
+    const container = document.getElementById(tabId);
+    if (!container) return;
+    let panier = [];
+    container.innerHTML = `<div class="summary">🧾 Vente directe ${zoneLabel} — le client commande au comptoir ou auprès d'une serveuse, paiement immédiat, pas de compte ni de code d'accès.</div>
+    <div class="card-grid">
+        <div class="card"><h3>🍹 Menu ${zoneLabel}</h3><div id="vdMenu_${tabId}"></div></div>
+        <div class="card"><h3>🧾 Commande en cours</h3><div id="vdCart_${tabId}"></div>
+            <button id="vdEncaisser_${tabId}" class="print-receipt" style="width:100%;">Encaisser</button>
+        </div>
+    </div>
+    <div class="card" style="margin-top:1.5rem;"><h3>📜 Ventes récentes</h3><div id="vdHistorique_${tabId}"></div></div>`;
+
+    function refreshMenu() {
+        const produits = produitsBar.filter(p => p.zone === "bar" && p.stock > 0);
+        const parCategorie = {};
+        produits.forEach(p => { const c = p.categorie || "autre"; (parCategorie[c] = parCategorie[c]||[]).push(p); });
+        document.getElementById(`vdMenu_${tabId}`).innerHTML = Object.keys(parCategorie).map(cat => `
+            <div style="font-size:0.75rem;color:#94a3b8;font-weight:700;text-transform:uppercase;margin:0.6rem 0 0.2rem;">${cat}</div>
+            ${parCategorie[cat].map(p => `
+                <div class="qty-stepper"><span style="flex:1;">${p.nom} - ${formatMontant(p.prix)}</span>
+                <button type="button" data-vd-minus="${p.id}">-</button><span id="vdQty_${tabId}_${p.id}">0</span><button type="button" data-vd-plus="${p.id}">+</button></div>
+            `).join('')}
+        `).join('') || "<em>Aucun produit disponible</em>";
+        document.querySelectorAll(`#vdMenu_${tabId} [data-vd-plus]`).forEach(btn => {
+            btn.addEventListener("click", () => {
+                const id = parseInt(btn.dataset.vdPlus);
+                const p = produits.find(x=>x.id===id);
+                let item = panier.find(i=>i.produitId===id);
+                const dejaEnPanier = item ? item.qte : 0;
+                if (dejaEnPanier >= p.stock) return;
+                if (!item) { item = { produitId: id, nom: p.nom, prix: p.prix, qte: 0 }; panier.push(item); }
+                item.qte++;
+                document.getElementById(`vdQty_${tabId}_${id}`).textContent = item.qte;
+                refreshCart();
+            });
+        });
+        document.querySelectorAll(`#vdMenu_${tabId} [data-vd-minus]`).forEach(btn => {
+            btn.addEventListener("click", () => {
+                const id = parseInt(btn.dataset.vdMinus);
+                let item = panier.find(i=>i.produitId===id);
+                if (!item) return;
+                item.qte--;
+                document.getElementById(`vdQty_${tabId}_${id}`).textContent = Math.max(0, item.qte);
+                if (item.qte <= 0) panier = panier.filter(i=>i.produitId!==id);
+                refreshCart();
+            });
+        });
+    }
+    function refreshCart() {
+        const cartDiv = document.getElementById(`vdCart_${tabId}`);
+        const total = panier.reduce((s,i)=>s+i.prix*i.qte,0);
+        cartDiv.innerHTML = panier.length ? (panier.map(i=>`${i.nom} x${i.qte} = ${formatMontant(i.prix*i.qte)}`).join("<br>") + `<br><strong>Total: ${formatMontant(total)}</strong>`) : "<em>Aucun article sélectionné</em>";
+        document.getElementById(`vdEncaisser_${tabId}`).disabled = panier.length === 0;
+    }
+    function refreshHistorique() {
+        const ventes = ventesBar.filter(v => v.emplacement === zone).slice(-8).reverse();
+        document.getElementById(`vdHistorique_${tabId}`).innerHTML = ventes.map(v => `${v.date} — ${v.items.map(i=>`${i.nom} x${i.qte}`).join(', ')} — ${formatMontant(parseFloat(v.total))}`).join("<hr>") || "<em>Aucune vente</em>";
+    }
+    document.getElementById(`vdEncaisser_${tabId}`)?.addEventListener("click", () => {
+        if (panier.length === 0) return;
+        for (const item of panier) {
+            const p = produitsBar.find(x=>x.id===item.produitId);
+            if (!p || p.stock < item.qte) { alert("Stock insuffisant pour " + item.nom); return; }
+        }
+        const total = panier.reduce((s,i)=>s+i.prix*i.qte,0);
+        panier.forEach(item => { const p = produitsBar.find(x=>x.id===item.produitId); p.stock -= item.qte; });
+        const idVente = Date.now();
+        ventesBar.push({ id: idVente, date: new Date().toLocaleString(), numeroTable: "-", emplacement: zone, items: panier.map(i=>({...i})), total: total.toFixed(2) });
+        saveAllData();
+        printReceipt(`Vente directe ${zoneLabel}`, panier.map(i=>`${i.nom} x${i.qte} = ${formatMontant(i.prix*i.qte)}`), total, {
+            barcodeValue: "V" + idVente,
+            footerNote: "MENU NORMAL — sans supplément VIP"
+        });
+        panier = [];
+        refreshMenu(); refreshCart(); refreshHistorique();
+    });
+    refreshMenu(); refreshCart(); refreshHistorique();
+}
+
 function renderCommandesQueue(role, tabId) {
     const container = document.getElementById(tabId);
     if(!container) return;
@@ -1831,9 +1928,8 @@ function showToast(text, type) {
 }
 function verifierNotifications() {
     if (!currentRole) return;
-    if (currentUser && (currentRole === "bar" || currentRole === "hotel")) {
-        const zones = currentRole === "bar" ? ["bar","vip"] : ["piscine"];
-        const nouvelles = commandes.filter(c => zones.includes(c.emplacement) && !ordresVus.has(c.id));
+    if (currentUser && currentRole === "bar") {
+        const nouvelles = commandes.filter(c => c.emplacement === "vip" && !ordresVus.has(c.id));
         nouvelles.forEach(c => {
             ordresVus.add(c.id);
             showToast(`🔔 Nouvelle commande — Table ${c.numeroTable} (${c.total.toFixed(2)} $)`, "commande");
@@ -1845,9 +1941,9 @@ function verifierNotifications() {
             messagesVus.add(m.id);
             showToast(`💬 ${m.fromNom} : ${m.text}`, "message");
         });
-        // Messages envoyés par un client depuis sa tablette vers l'équipe
-        if (currentRole === "bar" || currentRole === "hotel" || currentRole === "admin") {
-            const zonesVues = currentRole === "bar" ? ["bar","vip"] : currentRole === "hotel" ? ["piscine"] : null; // null = toutes zones (réception voit piscine, admin voit tout)
+        // Messages envoyés par un client depuis sa tablette vers l'équipe (VIP uniquement désormais)
+        if (currentRole === "bar" || currentRole === "admin") {
+            const zonesVues = currentRole === "bar" ? ["vip"] : null; // null = toutes zones (admin voit tout)
             const nouveauxTableMsgs = messages.filter(m => {
                 if (!m.tableId || m.fromId !== "table" || messagesVus.has(m.id)) return false;
                 if (!zonesVues) return true;

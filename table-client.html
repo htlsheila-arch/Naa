@@ -329,7 +329,7 @@ function renderClientOrderView() {
     `).join('');
     function renderMenuListe() {
         const produits = produitsZone.filter(p => (p.categorie || "nourriture") === clientMenuCategorie);
-        document.getElementById("clientMenu").innerHTML = (estVip ? `<div style="font-size:0.78rem;color:#b45309;font-weight:600;margin-bottom:0.5rem;">🥂 Service VIP : +${fraisServiceVipPourcent}% inclus dans les prix affichés</div>` : "") + produits.map(p => `
+        document.getElementById("clientMenu").innerHTML = produits.map(p => `
             <div class="qty-stepper"><span style="flex:1;">${p.nom} - ${formatMontant(prixAvecFrais(p.prix))}</span>
             <button data-minus="${p.id}">-</button><span id="qty_${p.id}">${(clientCart.find(i=>i.produitId===p.id)||{}).qte||0}</span><button data-plus="${p.id}">+</button></div>
         `).join('') || "<em>Aucun produit dans cette catégorie</em>";

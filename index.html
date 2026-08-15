@@ -387,6 +387,17 @@ footer { background: var(--night); color: #d7e6e2; padding: 70px 0 26px; text-al
     font-size: 1.4rem; display: flex; align-items: center; justify-content: center;
     box-shadow: 0 10px 30px rgba(232,104,74,0.5);
 }
+.whatsapp-fab {
+    position: fixed; right: 26px; bottom: 100px; z-index: 900;
+    width: 62px; height: 62px; border-radius: 50%;
+    background: linear-gradient(140deg, #25D366, #1ebe57); color: white; border: none;
+    font-size: 1.7rem; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 10px 30px rgba(37,211,102,0.5); text-decoration: none;
+}
+.whatsapp-fab::before {
+    content: ''; position: absolute; inset: -6px; border-radius: 50%; border: 2px solid #25D366;
+    animation: pulseRing 2.4s ease-out infinite;
+}
 .contact-fab::before {
     content: ''; position: absolute; inset: -6px; border-radius: 50%; border: 2px solid var(--coral);
     animation: pulseRing 2.4s ease-out infinite;
@@ -394,7 +405,7 @@ footer { background: var(--night); color: #d7e6e2; padding: 70px 0 26px; text-al
 @keyframes pulseRing { 0% { transform: scale(0.85); opacity: 0.8; } 100% { transform: scale(1.5); opacity: 0; } }
 
 .contact-panel {
-    position: fixed; right: 26px; bottom: 100px; z-index: 900; width: min(90vw, 320px);
+    position: fixed; right: 26px; bottom: 174px; z-index: 900; width: min(90vw, 320px);
     background: white; border-radius: 18px; box-shadow: 0 25px 50px rgba(0,0,0,0.25);
     padding: 24px; transform: translateY(20px) scale(0.95); opacity: 0; pointer-events: none;
     transition: all 0.3s var(--ease);
@@ -617,13 +628,14 @@ footer { background: var(--night); color: #d7e6e2; padding: 70px 0 26px; text-al
         <div class="social-links">
             <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
             <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-            <a href="#" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+            <a href="https://wa.me/50943263326" target="_blank" rel="noopener" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
         </div>
         <p class="copyright">&copy; 2026 LA CASA DEL SHEI. TOUS DROITS RÉSERVÉS.</p>
     </div>
 </footer>
 
 <!-- CONTACT RAPIDE (flottant) -->
+<a href="https://wa.me/50943263326" target="_blank" rel="noopener" class="whatsapp-fab" aria-label="Nous contacter sur WhatsApp"><i class="fab fa-whatsapp"></i></a>
 <button class="contact-fab" id="contactFabBtn" aria-label="Contact rapide"><i class="fas fa-comment-dots"></i></button>
 <div class="contact-panel" id="contactPanel">
     <h4>Une question ?</h4>

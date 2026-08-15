@@ -357,6 +357,7 @@ function buildUI() {
     if (currentRole === "admin") {
         tabs = [
             { id: "adminDash", label: "📊 Dashboard Global", render: renderAdminDashboard },
+            { id: "toutesFonctions", label: "🗂️ Toutes les fonctions", render: () => renderToutesLesFonctions("toutesFonctions") },
             { id: "manageBarPiscineHotel", label: "🏢 Bar / Piscine / Hôtel", render: renderGestionBarPiscineHotel },
             { id: "siteWeb", label: "🌐 Site Web", render: () => renderSiteWeb("siteWeb") },
             { id: "manageTaux", label: "💱 Taux de change", render: renderTauxChange },
@@ -441,32 +442,79 @@ function updateNavBadges() {
 // ================================================================
 // 5. DASHBOARD ADMIN & GESTION
 // ================================================================
+function estAujourdhui(valeurDate) {
+    if (!valeurDate) return false;
+    const d = new Date(valeurDate);
+    if (isNaN(d.getTime())) return false;
+    const now = new Date();
+    return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && d.getDate() === now.getDate();
+}
+
+// ================================================================
+// HUB "TOUTES LES FONCTIONS" — accès rapide à tout, pour l'admin qui
+// veut juste consulter le dashboard mais garder tout le reste à portée
+// ================================================================
+function renderToutesLesFonctions(tabId) {
+    const container = document.getElementById(tabId);
+    if (!container) return;
+    const groupes = [
+        { titre: "🏢 Bar, Piscine & Hôtel", tabs: ["manageBarPiscineHotel"] },
+        { titre: "🌐 Site Web", tabs: ["siteWeb"] },
+        { titre: "⚙️ Réglages généraux", tabs: ["manageTaux"] },
+        { titre: "👥 Personnel", tabs: ["manageEmployees"] },
+        { titre: "💈 Barber Shop", tabs: ["manageBarberServices", "manageCoiffeurs"] },
+        { titre: "🛒 Market", tabs: ["manageMarket"] }
+    ];
+    container.innerHTML = `<div class="summary">🗂️ Tout ce que vous pouvez gérer, au même endroit — cliquez pour y aller directement.</div>
+    <div class="card-grid">
+        ${groupes.map(g => `
+            <div class="card"><h3>${g.titre}</h3>
+                ${g.tabs.map(tid => {
+                    const btnRef = document.querySelector(`.nav-btn[data-tab="${tid}"]`);
+                    const label = btnRef ? btnRef.querySelector('.nav-btn-label').textContent : tid;
+                    return `<button type="button" data-jump="${tid}" style="width:100%;margin:0.25rem 0;text-align:left;">${label}</button>`;
+                }).join('')}
+            </div>
+        `).join('')}
+    </div>`;
+    container.querySelectorAll("[data-jump]").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const target = document.querySelector(`.nav-btn[data-tab="${btn.dataset.jump}"]`);
+            if (target) target.click();
+        });
+    });
+}
+
 function renderAdminDashboard() {
     const container = document.getElementById("adminDash");
     if (!container) return;
-    const caBar = ventesBar.filter(v=>v.emplacement==="bar").reduce((s,v)=>s+parseFloat(v.total),0);
-    const caPiscine = ventesBar.filter(v=>v.emplacement==="piscine").reduce((s,v)=>s+parseFloat(v.total),0);
-    const caPiscineSessions = ventesPiscineSessions.reduce((s,v)=>s+v.total,0);
-    const caVIP = ventesBar.filter(v=>v.emplacement==="vip").reduce((s,v)=>s+parseFloat(v.total),0);
-    const caMarket = ventesMarket.reduce((s,v)=>s+parseFloat(v.total),0);
-    const caBarber = ventesBarber.reduce((s,v)=>s+v.montant,0);
-    const totalCA = caBar + caPiscine + caPiscineSessions + caVIP + caMarket + caBarber;
-    const nbResa = reservationsHotel.length;
+    const caBar = ventesBar.filter(v=>v.emplacement==="bar" && estAujourdhui(v.date)).reduce((s,v)=>s+parseFloat(v.total),0);
+    const caPiscine = ventesBar.filter(v=>v.emplacement==="piscine" && estAujourdhui(v.date)).reduce((s,v)=>s+parseFloat(v.total),0);
+    const caPiscineSessions = ventesPiscineSessions.filter(v=>estAujourdhui(v.date)).reduce((s,v)=>s+v.total,0);
+    const caVIP = ventesBar.filter(v=>v.emplacement==="vip" && estAujourdhui(v.date)).reduce((s,v)=>s+parseFloat(v.total),0);
+    const caMarket = ventesMarket.filter(v=>estAujourdhui(v.date)).reduce((s,v)=>s+parseFloat(v.total),0);
+    const caBarber = ventesBarber.filter(v=>estAujourdhui(v.date)).reduce((s,v)=>s+v.montant,0);
+    const caHotel = reservationsHotel.filter(r=>estAujourdhui(r.dateDebut)).reduce((s,r)=>s+(r.montant||0),0);
+    const totalCA = caBar + caPiscine + caPiscineSessions + caVIP + caMarket + caBarber + caHotel;
+    const nbResaAujourdhui = reservationsHotel.filter(r=>estAujourdhui(r.dateDebut)).length;
     const nbTablesOuvertes = comptesTables.filter(c=>c.statut==="ouvert").length;
+    const dateAujourdhui = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
     container.innerHTML = `
-        <div class="summary">📊 Synthèse Complexe La Casa Del Shei</div>
+        <div class="summary">📊 Aujourd'hui — ${dateAujourdhui}</div>
         <div class="dashboard-stats">
-            <div class="stat-card"><div class="stat-number">${totalCA.toFixed(2)} $</div><div>CA global (${Math.round(totalCA*tauxChange).toLocaleString('fr-FR')} HTG)</div></div>
+            <div class="stat-card"><div class="stat-number">${totalCA.toFixed(2)} $</div><div>CA du jour (${Math.round(totalCA*tauxChange).toLocaleString('fr-FR')} HTG)</div></div>
             <div class="stat-card"><div class="stat-number">${caBar.toFixed(2)} $</div><div>Bar</div></div>
             <div class="stat-card"><div class="stat-number">${caPiscine.toFixed(2)} $</div><div>Bar Piscine</div></div>
             <div class="stat-card"><div class="stat-number">${caPiscineSessions.toFixed(2)} $</div><div>Séances Piscine</div></div>
             <div class="stat-card"><div class="stat-number">${caVIP.toFixed(2)} $</div><div>VIP</div></div>
             <div class="stat-card"><div class="stat-number">${caMarket.toFixed(2)} $</div><div>Market</div></div>
             <div class="stat-card"><div class="stat-number">${caBarber.toFixed(2)} $</div><div>Barber Shop</div></div>
-            <div class="stat-card"><div class="stat-number">${nbResa}</div><div>Réservations hôtel</div></div>
-            <div class="stat-card"><div class="stat-number">${nbTablesOuvertes}</div><div>Tables ouvertes</div></div>
+            <div class="stat-card"><div class="stat-number">${caHotel.toFixed(2)} $</div><div>Hôtel (réservé aujourd'hui)</div></div>
+            <div class="stat-card"><div class="stat-number">${nbResaAujourdhui}</div><div>Réservations aujourd'hui</div></div>
+            <div class="stat-card"><div class="stat-number">${nbTablesOuvertes}</div><div>Tables ouvertes maintenant</div></div>
         </div>
-        <button id="globalReset" class="danger-btn">🔁 Réinitialiser toutes les données</button>
+        <p style="color:#64748b;font-size:0.85rem;margin-top:0.5rem;">Ces chiffres ne comptent que les ventes/réservations d'aujourd'hui. Pour gérer les prix, produits, employés, etc., utilisez l'onglet <strong>🗂️ Toutes les fonctions</strong>.</p>
+        <button id="globalReset" class="danger-btn" style="margin-top:1rem;">🔁 Réinitialiser toutes les données</button>
     `;
     document.getElementById("globalReset")?.addEventListener("click", () => {
         if(confirm("Toutes les données seront effacées (sauf comptes par défaut).")) {

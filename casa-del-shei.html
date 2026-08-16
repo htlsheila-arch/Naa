@@ -629,21 +629,62 @@ function renderReglagesPiscine(tabId) {
 // ================================================================
 // 5bis. GESTION CONSOLIDÉE : BAR / PISCINE / HÔTEL (un seul onglet admin)
 // ================================================================
+// ================================================================
+// ESPACE UNIQUE DE VENTE POUR L'ADMIN — regroupe les 4 types de vente
+// (produit Bar, produit Piscine, séance Piscine, service Hôtel) en un
+// seul endroit. Volontairement séparé et distinct des écrans de gestion
+// (produits/prix/réservations) : l'admin gère, il ne vend pas au quotidien —
+// cet espace n'est là que pour dépanner ou vendre exceptionnellement.
+// ================================================================
+function renderVenteAdmin(tabId) {
+    const container = document.getElementById(tabId);
+    if (!container) return;
+    const options = [
+        { key: "produitBar", label: "🍹 Produit — Bar" },
+        { key: "produitPiscine", label: "🍹 Produit — Piscine" },
+        { key: "seancePiscine", label: "🏊 Séance Piscine" },
+        { key: "serviceHotel", label: "🍽️ Service Hôtel" }
+    ];
+    let choix = "produitBar";
+    container.innerHTML = `<div class="summary" style="background:linear-gradient(120deg,#fee2e2,#fef3c7);border-color:#fca5a5;color:#7c2d12;">
+        🧾 Espace de vente — ceci n'est pas de la gestion. Utilisez cet espace uniquement pour vendre exceptionnellement (dépannage), pas au quotidien : c'est le rôle du personnel.
+    </div>
+    <div id="vaChoix" style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:1.2rem;"></div>
+    <div id="vaContent"></div>`;
+    const choixDiv = document.getElementById("vaChoix");
+    function afficherChoix() {
+        choixDiv.innerHTML = "";
+        options.forEach(opt => {
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.textContent = opt.label;
+            btn.style.background = opt.key === choix ? "#f97316" : "#334155";
+            btn.addEventListener("click", () => { choix = opt.key; afficherChoix(); afficherContenu(); });
+            choixDiv.appendChild(btn);
+        });
+    }
+    function afficherContenu() {
+        if (choix === "produitBar") renderVenteDirecte("vaContent", "bar", "Bar");
+        else if (choix === "produitPiscine") renderVenteDirecte("vaContent", "piscine", "Bar Piscine");
+        else if (choix === "seancePiscine") renderVentePiscineSession("vaContent");
+        else if (choix === "serviceHotel") renderHotelServices("vaContent");
+    }
+    afficherChoix();
+    afficherContenu();
+}
+
 function renderGestionBarPiscineHotel() {
     const container = document.getElementById("manageBarPiscineHotel");
     if(!container) return;
     const sections = [
-        { key: "produits", label: "🍻 Produits Bar & VIP", render: () => renderManageBarProducts("gbphContent") },
-        { key: "venteDirecteBar", label: "🧾 Vente Directe (Bar)", render: () => renderVenteDirecte("gbphContent", "bar", "Bar") },
-        { key: "venteDirectePiscine", label: "🧾 Vente Directe (Piscine)", render: () => renderVenteDirecte("gbphContent", "piscine", "Bar Piscine") },
+        { key: "produits", label: "🍻 Produits Bar & VIP (prix, stock)", render: () => renderManageBarProducts("gbphContent") },
         { key: "comptes", label: "💳 Comptes Tables (VIP)", render: () => renderComptesTables("gbphContent", "vip") },
-        { key: "reglagesPiscine", label: "🏊 Réglages Piscine", render: () => renderReglagesPiscine("gbphContent") },
-        { key: "seancesPiscine", label: "🏊 Séances Piscine", render: () => renderVentePiscineSession("gbphContent") },
-        { key: "chambresGestion", label: "🛏️ Chambres (gestion)", render: () => renderManageChambres("gbphContent") },
+        { key: "reglagesPiscine", label: "🏊 Réglages Piscine (prix, durée)", render: () => renderReglagesPiscine("gbphContent") },
+        { key: "chambresGestion", label: "🛏️ Chambres (gestion, prix)", render: () => renderManageChambres("gbphContent") },
         { key: "chambresDispo", label: "🕒 Disponibilité Chambres", render: () => renderDispoChambres("gbphContent") },
         { key: "reservations", label: "📅 Réservations Hôtel", render: () => renderHotelResa("gbphContent") },
-        { key: "servicesHotel", label: "🍽️ Services Hôtel (catalogue)", render: () => renderManageHotelServices("gbphContent") },
-        { key: "servicesAppliquer", label: "🧾 Appliquer un service", render: () => renderHotelServices("gbphContent") }
+        { key: "servicesHotel", label: "🍽️ Services Hôtel (catalogue, prix)", render: () => renderManageHotelServices("gbphContent") },
+        { key: "vente", label: "🧾 Effectuer une vente", render: () => renderVenteAdmin("gbphContent") }
     ];
     // On reste sur la sous-section où l'utilisateur était (mémorisée dans gbphActiveKey),
     // au lieu de revenir systématiquement à la première à chaque rafraîchissement automatique.

@@ -163,6 +163,8 @@ function loadAllData() {
             coiffeurs = d.coiffeurs || [];
             ventesBarber = d.ventesBarber || [];
             produitsBar = d.produitsBar || [];
+            // Migration : l'ancien catalogue VIP séparé rejoint le catalogue partagé Bar/Piscine/VIP
+            produitsBar.forEach(p => { if (p.zone === "vip") p.zone = "bar"; });
             ventesBar = d.ventesBar || [];
             articlesMarket = d.articlesMarket || [];
             ventesMarket = d.ventesMarket || [];
@@ -291,10 +293,9 @@ function renderClientOrderView() {
         return;
     }
     document.getElementById("clientHeaderTitle").textContent = `🍹 Table ${compte.numeroTable}`;
-    const zoneProduit = compte.emplacement === "vip" ? "vip" : "bar";
     const estVip = compte.emplacement === "vip";
     const prixAvecFrais = (prixBase) => estVip ? prixBase * (1 + fraisServiceVipPourcent/100) : prixBase;
-    const produitsZone = produitsBar.filter(p=>p.zone===zoneProduit && p.stock>0);
+    const produitsZone = produitsBar.filter(p=>p.zone==="bar" && p.stock>0);
     const mesCommandes = commandes.filter(c=>c.compteTableId===compte.id).slice().reverse();
 
     content.innerHTML = `

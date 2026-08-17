@@ -227,6 +227,8 @@ function loadAllData() {
             coiffeurs = d.coiffeurs || [];
             ventesBarber = d.ventesBarber || [];
             produitsBar = d.produitsBar || [];
+            // Migration : l'ancien catalogue VIP séparé rejoint le catalogue partagé Bar/Piscine/VIP
+            produitsBar.forEach(p => { if (p.zone === "vip") p.zone = "bar"; });
             ventesBar = d.ventesBar || [];
             articlesMarket = d.articlesMarket || [];
             ventesMarket = d.ventesMarket || [];
@@ -976,10 +978,10 @@ function renderManageBarProducts(tabId) {
     tabId = tabId || "manageBarProducts";
     const container = document.getElementById(tabId);
     if(!container) return;
-    container.innerHTML = `<div class="summary">🍻 Produits — le stock "Bar" est partagé entre le Bar classique et le Bar Piscine</div><div class="card-grid"><div class="card"><h3>➕ Ajouter produit</h3><input id="prodNom" placeholder="Nom"><input id="prodPrix" type="number" placeholder="Prix"><input id="prodStock" type="number" placeholder="Stock"><select id="prodZone"><option value="bar">Bar & Piscine (stock partagé)</option><option value="vip">VIP</option></select><select id="prodCategorie">${CATEGORIES_MENU.map(c=>`<option value="${c.key}">${c.label}</option>`).join('')}</select><button id="addProduct">Ajouter</button></div><div class="card"><h3>📋 Produits</h3><div id="listProducts"></div></div></div>`;
+    container.innerHTML = `<div class="summary">🍻 Un seul catalogue, un seul stock partagé — Bar, Bar Piscine et VIP vendent les mêmes produits aux mêmes prix. Le VIP a juste un pourcentage de service qui s'ajoute automatiquement (réglable dans "Réglages Piscine").</div><div class="card-grid"><div class="card"><h3>➕ Ajouter produit</h3><input id="prodNom" placeholder="Nom"><input id="prodPrix" type="number" placeholder="Prix"><input id="prodStock" type="number" placeholder="Stock"><select id="prodCategorie">${CATEGORIES_MENU.map(c=>`<option value="${c.key}">${c.label}</option>`).join('')}</select><button id="addProduct">Ajouter</button></div><div class="card"><h3>📋 Produits</h3><div id="listProducts"></div></div></div>`;
     function refresh() {
         const listDiv = document.getElementById("listProducts");
-        if(listDiv) listDiv.innerHTML = produitsBar.map(p => `<div>${p.nom} - ${formatMontant(p.prix)} - Stock:${p.stock} (${p.zone==="bar"?"Bar & Piscine":"VIP"} · ${labelCategorie(p.categorie)}) <button class="danger-btn" data-id="${p.id}">Supprimer</button></div>`).join('');
+        if(listDiv) listDiv.innerHTML = produitsBar.map(p => `<div>${p.nom} - ${formatMontant(p.prix)} - Stock:${p.stock} (${labelCategorie(p.categorie)}) <button class="danger-btn" data-id="${p.id}">Supprimer</button></div>`).join('');
         listDiv.querySelectorAll("[data-id]").forEach(btn => {
             btn.addEventListener("click", () => {
                 const id = parseInt(btn.dataset.id);
@@ -992,10 +994,9 @@ function renderManageBarProducts(tabId) {
         const nom = document.getElementById("prodNom").value;
         const prix = parseFloat(document.getElementById("prodPrix").value);
         const stock = parseInt(document.getElementById("prodStock").value);
-        const zone = document.getElementById("prodZone").value;
         const categorie = document.getElementById("prodCategorie").value;
         if(!nom || isNaN(prix) || isNaN(stock)) return;
-        produitsBar.push({ id: Date.now(), nom, prix, zone, stock, categorie });
+        produitsBar.push({ id: Date.now(), nom, prix, zone: "bar", stock, categorie });
         saveAllData(); refresh();
     });
     refresh();
@@ -1004,10 +1005,10 @@ function renderManageBarProducts(tabId) {
 function renderManageMarket() {
     const container = document.getElementById("manageMarket");
     if(!container) return;
-    container.innerHTML = `<div class="summary">🛒 Articles du mini market</div><div class="card-grid"><div class="card"><h3>➕ Ajouter article</h3><input id="artNom" placeholder="Nom"><input id="artPrix" type="number" placeholder="Prix"><input id="artStock" type="number" placeholder="Stock"><input id="artCode" placeholder="Code barre"><button id="addArticle">Ajouter</button></div><div class="card"><h3>📋 Liste</h3><div id="listArticles"></div></div></div>`;
+    container.innerHTML = `<div class="summary">🛒 Articles du mini market — la pharmacie est une catégorie d'articles vendus ici, pas un espace séparé</div><div class="card-grid"><div class="card"><h3>➕ Ajouter article</h3><input id="artNom" placeholder="Nom"><input id="artPrix" type="number" placeholder="Prix"><input id="artStock" type="number" placeholder="Stock"><input id="artCode" placeholder="Code barre"><select id="artCategorie"><option value="epicerie">🛒 Épicerie / Divers</option><option value="pharmacie">💊 Pharmacie</option></select><button id="addArticle">Ajouter</button></div><div class="card"><h3>📋 Liste</h3><div id="listArticles"></div></div></div>`;
     function refresh() {
         const listDiv = document.getElementById("listArticles");
-        if(listDiv) listDiv.innerHTML = articlesMarket.map(a => `<div>${a.nom} - ${formatMontant(a.prix)} (stock:${a.stock}) code:${a.codeBarre} <button class="danger-btn" data-id="${a.id}">Supprimer</button></div>`).join('');
+        if(listDiv) listDiv.innerHTML = articlesMarket.map(a => `<div>${a.categorie==="pharmacie"?"💊":"🛒"} ${a.nom} - ${formatMontant(a.prix)} (stock:${a.stock}) code:${a.codeBarre} <button class="danger-btn" data-id="${a.id}">Supprimer</button></div>`).join('');
         listDiv.querySelectorAll("[data-id]").forEach(btn => {
             btn.addEventListener("click", () => {
                 const id = parseInt(btn.dataset.id);
@@ -1021,8 +1022,9 @@ function renderManageMarket() {
         const prix = parseFloat(document.getElementById("artPrix").value);
         const stock = parseInt(document.getElementById("artStock").value);
         const codeBarre = document.getElementById("artCode").value;
+        const categorie = document.getElementById("artCategorie").value;
         if(!nom || isNaN(prix) || isNaN(stock)) return;
-        articlesMarket.push({ id: Date.now(), nom, prix, stock, codeBarre });
+        articlesMarket.push({ id: Date.now(), nom, prix, stock, codeBarre, categorie });
         saveAllData(); refresh();
     });
     refresh();
@@ -1818,6 +1820,7 @@ function renderMarketVente() {
             <div id="scanFeedback"></div>
         </div>
         <div class="card"><h3>🔎 Recherche manuelle</h3>
+            <select id="filterCategorie"><option value="">Toutes catégories</option><option value="epicerie">🛒 Épicerie / Divers</option><option value="pharmacie">💊 Pharmacie</option></select>
             <input id="searchProduct" placeholder="Nom ou code-barre">
             <button id="searchBtn">Rechercher</button>
             <select id="productList" size="5"></select>
@@ -1836,8 +1839,9 @@ function renderMarketVente() {
     function refreshProductList(filter="") {
         const list = document.getElementById("productList");
         if(!list) return;
-        let filtered = articlesMarket.filter(a => a.nom.toLowerCase().includes(filter.toLowerCase()) || a.codeBarre.includes(filter));
-        list.innerHTML = filtered.map(a => `<option value="${a.id}">${a.nom} - ${a.prix.toFixed(2)} $ (stock:${a.stock})</option>`).join('');
+        const cat = document.getElementById("filterCategorie")?.value || "";
+        let filtered = articlesMarket.filter(a => (a.nom.toLowerCase().includes(filter.toLowerCase()) || a.codeBarre.includes(filter)) && (!cat || a.categorie === cat || (cat==="epicerie" && !a.categorie)));
+        list.innerHTML = filtered.map(a => `<option value="${a.id}">${a.categorie==="pharmacie"?"💊":"🛒"} ${a.nom} - ${a.prix.toFixed(2)} $ (stock:${a.stock})</option>`).join('');
     }
     function addArticleToCart(article, qte) {
         if(!article || article.stock < qte) { document.getElementById("scanFeedback").innerHTML = `<span style="color:red;">Stock insuffisant pour ${article?article.nom:'cet article'}</span>`; return; }
@@ -1867,6 +1871,7 @@ function renderMarketVente() {
     });
     document.getElementById("stopScan")?.addEventListener("click", stopMarketScanner);
     document.getElementById("searchBtn")?.addEventListener("click", () => refreshProductList(document.getElementById("searchProduct").value));
+    document.getElementById("filterCategorie")?.addEventListener("change", () => refreshProductList(document.getElementById("searchProduct").value));
     document.getElementById("addToCart")?.addEventListener("click", () => {
         const artId = parseInt(document.getElementById("productList").value);
         const qte = parseInt(document.getElementById("marketQty").value) || 1;
